@@ -635,9 +635,13 @@ class fastqWriter( object ):
         return self.file.close()
 
 class fastqJoiner( object ):
-    def __init__( self, format, force_quality_encoding = None ):
+    def __init__( self, format, force_quality_encoding = None, paste="" ):
         self.format = format
         self.force_quality_encoding = force_quality_encoding
+        outformat = fastqSequencingRead.get_class_by_format( format )
+        self.paste_sequence = paste
+        self.paste_ascii_quality = chr( outformat.ascii_max ) * len( paste )
+        self.paste_decimal_quality = " ".join( [ str( outformat.quality_max ) for x in range( len( paste ) ) ] )
     def join( self, read1, read2 ):
         read1_id, read1_sep, read1_desc = read1.identifier.partition(' ')
         read2_id, read2_sep, read2_desc = read2.identifier.partition(' ')
@@ -673,13 +677,14 @@ class fastqJoiner( object ):
         if rval.sequence_space == 'color':
             #need to handle color space joining differently
             #convert to nuc space, join, then convert back
-            rval.sequence = rval.convert_base_to_color_space( new_read1.convert_color_to_base_space( new_read1.sequence ) + new_read2.convert_color_to_base_space( new_read2.sequence ) )
+            rval.sequence = rval.convert_base_to_color_space( new_read1.convert_color_to_base_space( new_read1.sequence ) + self.paste_sequence + new_read2.convert_color_to_base_space( new_read2.sequence ) )
         else:
-            rval.sequence = new_read1.sequence + new_read2.sequence
+            rval.sequence = new_read1.sequence + self.paste_sequence + new_read2.sequence
         if force_quality_encoding == 'ascii':
-            rval.quality = new_read1.quality + new_read2.quality
+            rval.quality = new_read1.quality + self.paste_ascii_quality + new_read2.quality
         else:
-            rval.quality = "%s %s" % ( new_read1.quality.strip(), new_read2.quality.strip() )
+            rval.quality = "%s %s" % ( new_read1.quality.strip(), self.paste_decimal_quality )
+            rval.quality = ( "%s %s" % ( rval.quality.strip(), new_read2.quality.strip() ) ).strip()
         return rval
     def get_paired_identifier( self, fastq_read ):
         read_id, read_sep, read_desc = fastq_read.identifier.partition(' ')
