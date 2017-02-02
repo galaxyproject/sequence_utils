@@ -21,11 +21,12 @@ PROJECT_URL?=https://github.com/galaxyproject/sequence_utils
 PROJECT_NAME?=sequence_utils
 TEST_DIR?=tests
 DOCS_DIR?=docs
+ITEM?=
 
 .PHONY: clean-pyc clean-build docs clean
 
 help:
-    @egrep '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@egrep '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
