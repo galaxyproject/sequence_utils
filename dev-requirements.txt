@@ -1,0 +1,21 @@
+# For testing
+tox
+nose
+coverage
+
+#Building Docs
+sphinx==1.3.6
+# Sphinx bug with latest typing https://github.com/sphinx-doc/sphinx/issues/2470
+sphinx_rtd_theme
+
+# Used to check readme.
+readme
+
+# Used for code checking.
+pyflakes
+flake8
+flake8-import-order
+
+# For release
+wheel
+twine
