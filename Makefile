@@ -70,7 +70,10 @@ lint-readme: ## check README formatting for PyPI
 test: ## run tests with the default Python (faster than tox)
 	$(IN_VENV) nosetests $(NOSE_TESTS)
 
-tox:
+tool-tests: ## Run tools-devteam tool tests against library in current state
+	bash tests/planemo_test.bash
+
+tox: ## run tests with tox in the specified ENV, defaults to py27
 	$(IN_VENV) tox -e $(ENV) -- $(ARGS)
 
 _coverage-report: ## build coverage report with the default Python
