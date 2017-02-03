@@ -12,7 +12,7 @@ OPEN_RESOURCE=bash -c 'open $$0 || xdg-open $$0'
 IN_VENV=if [ -f $(VENV)/bin/activate ]; then . $(VENV)/bin/activate; fi;
 # TODO: add this upstream as a remote if it doesn't already exist.
 UPSTREAM?=galaxyproject
-SOURCE_DIR?=galaxy
+SOURCE_DIR?=galaxy_utils
 BUILD_SCRIPTS_DIR=scripts
 VERSION?=$(shell python $(BUILD_SCRIPTS_DIR)/print_version_for_release.py $(SOURCE_DIR))
 # TODO: get a RTD

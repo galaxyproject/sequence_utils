@@ -19,6 +19,7 @@ History
 * Merge in PEP-8 and Python 3 fixes from the core Galaxy project thanks to @nsoranzo.
   `Pull Request 4`_
 * Implement project testings. a9b907c_
+* First release published to PyPI.
 
 ---------------------
 1.0.1 (2015-12-10)
