@@ -1,6 +1,8 @@
 # Dan Blankenberg
 from __future__ import print_function
 
+import bz2
+import gzip
 import math
 import string
 
@@ -368,6 +370,8 @@ class fastqCSSangerRead( fastqSequencingRead ):
 FASTQ_FORMATS = {}
 for format in [ fastqIlluminaRead, fastqSolexaRead, fastqSangerRead, fastqCSSangerRead ]:
     FASTQ_FORMATS[ format.format ] = format
+    FASTQ_FORMATS[ format.format + ".gz" ] = format
+    FASTQ_FORMATS[ format.format + ".bz2" ] = format
 
 
 class fastqAggregator( object ):
@@ -535,7 +539,20 @@ class fastqAggregator( object ):
 
 
 class fastqReader( Iterator ):
-    def __init__( self, fh, format='sanger', apply_galaxy_conventions=False ):
+    def __init__( self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None ):
+        if fh is None:
+            assert path is not None
+            if format.endswith(".gz"):
+                fh = gzip.GzipFile(path, "r")
+            elif format.endswith(".bz2"):
+                fh = bz2.BZ2File(path, "r")
+            else:
+                fh = open(path, "r")
+        else:
+            if format.endswith(".gz"):
+                fh = gzip.GzipFile(fileobj=fh, mode="r")
+            elif format.endswith(".bz2"):
+                assert False, "bz2 formats do not support file handle inputs"
         self.file = fh
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
@@ -696,7 +713,20 @@ class fastqNamedReader( object ):
 
 
 class fastqWriter( object ):
-    def __init__( self, fh, format=None, force_quality_encoding=None ):
+    def __init__( self, fh=None, format=None, force_quality_encoding=None, path=None ):
+        if fh is None:
+            assert path is not None
+            if format.endswith(".gz"):
+                fh = gzip.GzipFile(path, "wb")
+            elif format.endswith(".bz2"):
+                fh = bz2.BZ2File(path, "wb")
+            else:
+                fh = open(path, "wb")
+        else:
+            if format.endswith(".gz"):
+                fh = gzip.GzipFile(fileobj=fh)
+            elif format.endswith(".bz2"):
+                assert False, "bz2 formats do not support file handle inputs"
         self.file = fh
         self.format = format
         self.force_quality_encoding = force_quality_encoding
