@@ -32,6 +32,7 @@ PROJECT_DESCRIPTION = 'Galaxy utilities for manipulating sequences Galaxy projec
 PACKAGES = [
     'galaxy_utils',
     'galaxy_utils.sequence',
+    'galaxy_utils.sequence.scripts',
 ]
 ENTRY_POINTS = '''
         [console_scripts]
