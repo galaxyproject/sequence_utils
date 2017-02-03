@@ -40,6 +40,9 @@ htmlcov
 output/*.html
 output/*/index.html
 
+# Planemo test output
+tool_test_output*
+
 # Sphinx
 docs/_build
 
