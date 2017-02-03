@@ -563,9 +563,13 @@ class fastqReader( Iterator ):
                 fh = gzip.GzipFile(fileobj=fh, mode="r")
             elif format.endswith(".bz2"):
                 assert False, "bz2 formats do not support file handle inputs"
-        self.file = fh
+        self._set_file_handle(fh)
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
+
+    def _set_file_handle(self, fh):
+        # Extension point for subclasses to wrap file handler
+        self.file = fh
 
     def close( self ):
         return self.file.close()
@@ -624,10 +628,12 @@ class fastqVerboseErrorReader( fastqReader ):
     MAX_PRINT_ERROR_BYTES = 1024
 
     def __init__( self, fh=None, **kwds ):
-        if fh is not None:
-            fh = ReadlineCountFile( fh )
         super( fastqVerboseErrorReader, self ).__init__( fh=fh, **kwds  )
         self.last_good_identifier = None
+
+    def _set_file_handle(self, fh):
+        # Extension point for subclasses to wrap file handler
+        self.file = ReadlineCountFile( fh )
 
     def __next__( self ):
         if not hasattr(self.file, "readline_count"):
