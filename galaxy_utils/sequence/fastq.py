@@ -6,6 +6,8 @@ import gzip
 import math
 import string
 
+import six
+
 from six import Iterator, string_types
 
 from . import transform
@@ -543,11 +545,14 @@ class fastqReader( Iterator ):
         if fh is None:
             assert path is not None
             if format.endswith(".gz"):
-                fh = gzip.GzipFile(path, "r")
+                fh = gzip.open(path, mode="rt")
             elif format.endswith(".bz2"):
-                fh = bz2.BZ2File(path, "r")
+                if six.PY3:
+                    fh = bz2.open(path, mode="rt")
+                else:
+                    fh = bz2.BZ2File(path, mode="r")
             else:
-                fh = open(path, "r")
+                fh = open(path, "rt")
         else:
             if format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh, mode="r")

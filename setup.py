@@ -33,7 +33,10 @@ PACKAGES = [
     'galaxy_utils',
     'galaxy_utils.sequence',
 ]
-ENTRY_POINTS = ''''''
+ENTRY_POINTS = '''
+        [console_scripts]
+        gx-fastq-to-tabular=galaxy_utils.sequence.scripts.fastq_to_tabular:main
+'''
 PACKAGE_DATA = {}
 PACKAGE_DIR = {
     SOURCE_DIR: SOURCE_DIR,

@@ -5,16 +5,35 @@ import sys
 
 from tempfile import mkdtemp
 
+from galaxy_utils.sequence.scripts import (
+    fastq_to_tabular,
+)
+
 TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
 
 
 def test_fastq_to_tabular():
-    from .fastq_to_tabular import main
     i_path = _data_path("sanger_full_range_original_sanger.fastqsanger")
     o_path = _data_path("fastq_to_tabular_out_1.tabular")
     with _new_argv([i_path, "output", "1", "sanger"]):
-        main()
+        fastq_to_tabular.main()
+        _assert_paths_equal("output", o_path)
+
+
+def test_fastq_to_tabular_gz():
+    i_path = _data_path("sanger_full_range_original_sanger.fastqsanger.gz")
+    o_path = _data_path("fastq_to_tabular_out_1.tabular")
+    with _new_argv([i_path, "output", "1", "sanger.gz"]):
+        fastq_to_tabular.main()
+        _assert_paths_equal("output", o_path)
+
+
+def test_fastq_to_tabular_bz2():
+    i_path = _data_path("sanger_full_range_original_sanger.fastqsanger.bz2")
+    o_path = _data_path("fastq_to_tabular_out_1.tabular")
+    with _new_argv([i_path, "output", "1", "sanger.bz2"]):
+        fastq_to_tabular.main()
         _assert_paths_equal("output", o_path)
 
 

@@ -37,7 +37,8 @@ PROJECT_TEST_DIR=$PROJECT_DIRECTORY/tests
 TOOLS_DEVTEAM=$1
 
 TEST_FILES=(
-    tool_collections/galaxy_sequence_utils/fastq_to_tabular/fastq_to_tabular.py
+# Merged into scripts directory.
+#    tool_collections/galaxy_sequence_utils/fastq_to_tabular/fastq_to_tabular.py
     tool_collections/galaxy_sequence_utils/fastq_to_tabular/test-data/sanger_full_range_original_sanger.fastqsanger
     tool_collections/galaxy_sequence_utils/fastq_to_tabular/test-data/fastq_to_tabular_out_1.tabular
 )

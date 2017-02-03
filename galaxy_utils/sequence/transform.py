@@ -2,12 +2,26 @@
 # Contains methods to tranform sequence strings
 import string
 
-# Translation table for reverse Complement, with ambiguity codes
-DNA_COMPLEMENT = string.maketrans( "ACGTRYKMBDHVacgtrykmbdhv", "TGCAYRMKVHDBtgcayrmkvhdb" )
-RNA_COMPLEMENT = string.maketrans( "ACGURYKMBDHVacgurykmbdhv", "UGCAYRMKVHDBugcayrmkvhdb" )
-# Translation table for DNA <--> RNA
-DNA_TO_RNA = string.maketrans( "Tt", "Uu" )
-RNA_TO_DNA = string.maketrans( "Uu", "Tt" )
+import six
+
+DNA_COMPLEMENT_FROM = "ACGTRYKMBDHVacgtrykmbdhv"
+DNA_COMPLEMENT_TO = "TGCAYRMKVHDBtgcayrmkvhdb"
+
+RNA_COMPLEMENT_FROM = "ACGURYKMBDHVacgurykmbdhv"
+RNA_COMPLEMENT_TO = "UGCAYRMKVHDBugcayrmkvhdb"
+
+if six.PY2:
+    # Translation table for reverse Complement, with ambiguity codes
+    DNA_COMPLEMENT = string.maketrans( DNA_COMPLEMENT_FROM, DNA_COMPLEMENT_TO )
+    RNA_COMPLEMENT = string.maketrans( RNA_COMPLEMENT_FROM, RNA_COMPLEMENT_TO )
+    # Translation table for DNA <--> RNA
+    DNA_TO_RNA = string.maketrans( "Tt", "Uu" )
+    RNA_TO_DNA = string.maketrans( "Uu", "Tt" )
+else:
+    DNA_COMPLEMENT = str.maketrans( DNA_COMPLEMENT_FROM, DNA_COMPLEMENT_TO )
+    RNA_COMPLEMENT = str.maketrans( RNA_COMPLEMENT_FROM, RNA_COMPLEMENT_TO )
+    DNA_TO_RNA = str.maketrans( "Tt", "Uu" )
+    RNA_TO_DNA = str.maketrans( "Uu", "Tt" )
 
 
 # reverse sequence string
@@ -54,9 +68,9 @@ class ColorSpaceConverter( object ):
     color_to_base_dict[ 'T' ] = { '0': 'T', '1': 'G', '2': 'C', '3': 'A', '4': 'N', '5': 'N', '6': 'N', '.': 'N' }
     color_to_base_dict[ 'N' ] = { '0': 'N', '1': 'N', '2': 'N', '3': 'N', '4': 'N', '5': 'N', '6': 'N', '.': 'N' }
     base_to_color_dict = {}
-    for base, color_dict in color_to_base_dict.iteritems():
+    for base, color_dict in six.iteritems( color_to_base_dict ):
         base_to_color_dict[ base ] = {}
-        for key, value in color_dict.iteritems():
+        for key, value in six.iteritems( color_dict ):
             base_to_color_dict[ base ][ value ] = key
         base_to_color_dict[ base ][ 'N' ] = '4'  # force ACGT followed by N to be '4', because this is now 'processed' data; we could force to '.' (non-processed data) also
     base_to_color_dict[ 'N' ].update( { 'A': '5', 'C': '5', 'G': '5', 'T': '5', 'N': '6' } )
