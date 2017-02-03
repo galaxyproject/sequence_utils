@@ -735,7 +735,7 @@ class fastqWriter( object ):
                 fh = gzip.open(path, "wt")
             elif format.endswith(".bz2"):
                 if six.PY2:
-                    fh = bz2.BZ2File(path, mode="wt")
+                    fh = bz2.BZ2File(path, mode="w")
                 else:
                     fh = bz2.open(path, mode="wt")
             else:

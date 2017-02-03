@@ -37,11 +37,11 @@ PROJECT_TEST_DIR=$PROJECT_DIRECTORY/tests
 TOOLS_DEVTEAM=$1
 
 TEST_FILES=(
-# Merged into scripts directory.
-#    tool_collections/galaxy_sequence_utils/fastq_to_tabular/fastq_to_tabular.py
     tool_collections/galaxy_sequence_utils/fastq_to_tabular/test-data/sanger_full_range_original_sanger.fastqsanger
     tool_collections/galaxy_sequence_utils/fastq_to_tabular/test-data/fastq_to_tabular_out_1.tabular
     tool_collections/galaxy_sequence_utils/fastq_manipulation/test-data/fastq_trimmer_out1.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_combiner/test-data/fastq_combiner_in_1.fasta
+    tool_collections/galaxy_sequence_utils/fastq_combiner/test-data/fastq_combiner_no_qual_decimal_out_1.fastqsanger
 )
 
 

@@ -6,6 +6,7 @@ import sys
 from tempfile import mkdtemp
 
 from galaxy_utils.sequence.scripts import (
+    fastq_combiner,
     fastq_groomer,
     fastq_to_tabular,
 )
@@ -43,6 +44,14 @@ def test_fastq_groomer_bz2():
     with _new_argv([i_path, "sanger.bz2", "output", "sanger.bz2", 'ascii', 'summarize_input']):
         fastq_groomer.main()
         _assert_paths_equal("output", i_path)
+
+
+def test_fastq_combiner():
+    fasta_path = _data_path("fastq_combiner_in_1.fasta")
+    fastq_path = _data_path("fastq_combiner_no_qual_decimal_out_1.fastqsanger")
+    with _new_argv([fasta_path, "fasta", "None", "qualsanger", "output", "decimal"]):
+        fastq_combiner.main()
+        _assert_paths_equal("output", fastq_path)
 
 
 def _assert_paths_equal(actual, expected):
