@@ -52,7 +52,7 @@ then
         TOOLS_DEVTEAM="$TEMP_DIR/tools-devteam"
         git clone https://github.com/galaxyproject/tools-devteam.git "$TOOLS_DEVTEAM"
     fi
-    TARGET_TOOL_DIRS=(tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner tool_collections/galaxy_sequence_utils/fastq_manipulation tool_collections/galaxy_sequence_utils/fastq_groomer)
+    TARGET_TOOL_DIRS=(tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner tool_collections/galaxy_sequence_utils/fastq_manipulation tool_collections/galaxy_sequence_utils/fastq_groomer tool_collections/galaxy_sequence_utils/fastq_filter)
 else
     TARGET_TOOL_DIRS=("$1")
 fi
