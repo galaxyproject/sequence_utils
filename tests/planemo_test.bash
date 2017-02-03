@@ -45,13 +45,19 @@ cat "$SCRIPT_DIR/planemo_test_dependency_resolvers_conf_template.xml" | sed -e "
 
 . "$PLANEMO_VIRTUAL_ENV/bin/activate"
 
-if [ -z "$TOOLS_DEVTEAM" ];
+if [ -z "$1" ];
 then
-    TOOLS_DEVTEAM="$TEMP_DIR/tools-devteam"
-    git clone https://github.com/galaxyproject/tools-devteam.git "$TOOLS_DEVTEAM"
+    if [ -z "$TOOLS_DEVTEAM" ];
+    then
+        TOOLS_DEVTEAM="$TEMP_DIR/tools-devteam"
+        git clone https://github.com/galaxyproject/tools-devteam.git "$TOOLS_DEVTEAM"
+    fi
+    TARGET_TOOL_DIRS=(tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner tool_collections/galaxy_sequence_utils/fastq_manipulation)
+else
+    TARGET_TOOL_DIRS=("$1")
 fi
 
-for tool_dir in tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner
+for tool_dir in $TARGET_TOOL_DIRS
 do
-    planemo test --dependency_resolvers_config_file "$TEMP_DIR/dependency_resolvers_conf.xml" "$TOOLS_DEVTEAM/$tool_dir"
+    planemo test --no_cleanup --dependency_resolvers_config_file "$TEMP_DIR/dependency_resolvers_conf.xml" "$TOOLS_DEVTEAM/$tool_dir"
 done
