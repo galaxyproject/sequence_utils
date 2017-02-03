@@ -20,7 +20,7 @@ import galaxy_utils as project
 PROJECT_OWNER = project.PROJECT_OWNER
 PROJECT_NAME = project.PROJECT_NAME
 PROJECT_URL = project.PROJECT_URL
-PROJECT_API = PROJECT_URL.replace("https://github.com/", "https://api.github.com/repos/")
+PROJECT_API = PROJECT_URL.replace("https://github.com/", "https://api.github.com/repos/") + "/"
 
 
 def main(argv):
@@ -38,10 +38,7 @@ def main(argv):
         message = argv[2]
     elif not (ident.startswith("pr") or ident.startswith("issue")):
         api_url = urlparse.urljoin(PROJECT_API, "commits/%s" % ident)
-        print api_url
         req = requests.get(api_url).json()
-        print req
-        print "moo"
         commit = req["commit"]
         message = commit["message"]
         message = get_first_sentence(message)
