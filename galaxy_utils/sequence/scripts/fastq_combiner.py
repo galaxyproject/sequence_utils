@@ -4,8 +4,15 @@ from __future__ import print_function
 
 import sys
 
-from galaxy_utils.sequence.fastq import fastqWriter, fastqCombiner, fastqFakeFastaScoreReader
-from galaxy_utils.sequence.fasta import fastaReader, fastaNamedReader
+from galaxy_utils.sequence.fastq import (
+    fastqCombiner,
+    fastqFakeFastaScoreReader,
+    fastqWriter,
+)
+from galaxy_utils.sequence.fasta import (
+    fastaNamedReader,
+    fastaReader,
+)
 
 
 def main():
