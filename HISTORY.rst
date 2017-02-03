@@ -6,7 +6,7 @@ History
 .. to_doc
 
 ---------------------
-1.0.2.dev0
+1.0.2 (2017-02-02)
 ---------------------
 
 * Apply common galaxyproject template to Python structure. 5e9bfc0_
