@@ -6,6 +6,7 @@ import sys
 from tempfile import mkdtemp
 
 from galaxy_utils.sequence.scripts import (
+    fastq_groomer,
     fastq_to_tabular,
 )
 
@@ -37,11 +38,18 @@ def test_fastq_to_tabular_bz2():
         _assert_paths_equal("output", o_path)
 
 
+def test_fastq_groomer_bz2():
+    i_path = _data_path("sanger_full_range_original_sanger.fastqsanger.bz2")
+    with _new_argv([i_path, "sanger.bz2", "output", "sanger.bz2", 'ascii', 'summarize_input']):
+        fastq_groomer.main()
+        _assert_paths_equal("output", i_path)
+
+
 def _assert_paths_equal(actual, expected):
-    with open(actual, "r") as f:
+    with open(actual, "rb") as f:
         actual_contents = f.read()
 
-    with open(expected, "r") as f:
+    with open(expected, "rb") as f:
         expected_contents = f.read()
 
     assert actual_contents == expected_contents

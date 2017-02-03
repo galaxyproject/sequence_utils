@@ -36,6 +36,7 @@ PACKAGES = [
 ENTRY_POINTS = '''
         [console_scripts]
         gx-fastq-to-tabular=galaxy_utils.sequence.scripts.fastq_to_tabular:main
+        gx-fastq-groomer=galaxy_utils.sequence.scripts.fastq_groomer:main
 '''
 PACKAGE_DATA = {}
 PACKAGE_DIR = {

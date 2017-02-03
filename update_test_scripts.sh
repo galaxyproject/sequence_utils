@@ -41,6 +41,7 @@ TEST_FILES=(
 #    tool_collections/galaxy_sequence_utils/fastq_to_tabular/fastq_to_tabular.py
     tool_collections/galaxy_sequence_utils/fastq_to_tabular/test-data/sanger_full_range_original_sanger.fastqsanger
     tool_collections/galaxy_sequence_utils/fastq_to_tabular/test-data/fastq_to_tabular_out_1.tabular
+    tool_collections/galaxy_sequence_utils/fastq_manipulation/test-data/fastq_trimmer_out1.fastqsanger
 )
 
 

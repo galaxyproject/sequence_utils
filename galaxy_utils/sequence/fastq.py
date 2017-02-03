@@ -14,6 +14,11 @@ from . import transform
 from .fasta import fastaSequence
 from .sequence import SequencingRead
 
+if six.PY2:
+    LETTERS = string.letters
+else:
+    LETTERS = string.ascii_letters
+
 
 class fastqSequencingRead( SequencingRead ):
     format = 'sanger'  # sanger is default
@@ -287,7 +292,7 @@ class fastqCSSangerRead( fastqSequencingRead ):
         return fastqSequencingRead.__len__( self )
 
     def has_adapter_base( self ):
-        if self.sequence and self.sequence[0] in string.letters:  # adapter base must be a letter
+        if self.sequence and self.sequence[0] in LETTERS:  # adapter base must be a letter
             return True
         return False
 
@@ -618,11 +623,16 @@ class ReadlineCountFile( object ):
 class fastqVerboseErrorReader( fastqReader ):
     MAX_PRINT_ERROR_BYTES = 1024
 
-    def __init__( self, fh, **kwds ):
-        super( fastqVerboseErrorReader, self ).__init__( ReadlineCountFile( fh ), **kwds  )
+    def __init__( self, fh=None, **kwds ):
+        if fh is not None:
+            fh = ReadlineCountFile( fh )
+        super( fastqVerboseErrorReader, self ).__init__( fh=fh, **kwds  )
         self.last_good_identifier = None
 
     def __next__( self ):
+        if not hasattr(self.file, "readline_count"):
+            return super( fastqVerboseErrorReader, self ).__next__()
+
         last_good_end_offset = self.file.tell()
         last_readline_count = self.file.readline_count
         try:
@@ -722,11 +732,14 @@ class fastqWriter( object ):
         if fh is None:
             assert path is not None
             if format.endswith(".gz"):
-                fh = gzip.GzipFile(path, "wb")
+                fh = gzip.open(path, "wt")
             elif format.endswith(".bz2"):
-                fh = bz2.BZ2File(path, "wb")
+                if six.PY2:
+                    fh = bz2.BZ2File(path, mode="wt")
+                else:
+                    fh = bz2.open(path, mode="wt")
             else:
-                fh = open(path, "wb")
+                fh = open(path, "wt")
         else:
             if format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh)
