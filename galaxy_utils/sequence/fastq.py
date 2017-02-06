@@ -545,24 +545,29 @@ class fastqAggregator( object ):
         return column_stats
 
 
+def _fastq_open_stream(fh=None, format="sanger", path=None):
+    if fh is None:
+        assert path is not None
+        if format.endswith(".gz"):
+            fh = gzip.open(path, mode="rt")
+        elif format.endswith(".bz2"):
+            if six.PY3:
+                fh = bz2.open(path, mode="rt")
+            else:
+                fh = bz2.BZ2File(path, mode="r")
+        else:
+            fh = open(path, "rt")
+    else:
+        if format.endswith(".gz"):
+            fh = gzip.GzipFile(fileobj=fh, mode="r")
+        elif format.endswith(".bz2"):
+            assert False, "bz2 formats do not support file handle inputs"
+    return fh
+
+
 class fastqReader( Iterator ):
     def __init__( self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None ):
-        if fh is None:
-            assert path is not None
-            if format.endswith(".gz"):
-                fh = gzip.open(path, mode="rt")
-            elif format.endswith(".bz2"):
-                if six.PY3:
-                    fh = bz2.open(path, mode="rt")
-                else:
-                    fh = bz2.BZ2File(path, mode="r")
-            else:
-                fh = open(path, "rt")
-        else:
-            if format.endswith(".gz"):
-                fh = gzip.GzipFile(fileobj=fh, mode="r")
-            elif format.endswith(".bz2"):
-                assert False, "bz2 formats do not support file handle inputs"
+        fh = _fastq_open_stream(fh=fh, format=format, path=path)
         self._set_file_handle(fh)
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
@@ -663,7 +668,8 @@ class fastqVerboseErrorReader( fastqReader ):
 
 
 class fastqNamedReader( object ):
-    def __init__( self, fh, format='sanger', apply_galaxy_conventions=False ):
+    def __init__( self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None ):
+        fh = _fastq_open_stream(fh=fh, format=format, path=path)
         self.file = fh
         self.format = format
         self.reader = fastqReader( self.file, self.format )
