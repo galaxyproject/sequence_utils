@@ -42,6 +42,22 @@ TEST_FILES=(
     tool_collections/galaxy_sequence_utils/fastq_manipulation/test-data/fastq_trimmer_out1.fastqsanger
     tool_collections/galaxy_sequence_utils/fastq_combiner/test-data/fastq_combiner_in_1.fasta
     tool_collections/galaxy_sequence_utils/fastq_combiner/test-data/fastq_combiner_no_qual_decimal_out_1.fastqsanger
+    tools/fastq_trimmer_by_quality/test-data/sanger_full_range_quality_trimmed_out_1.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_masker_by_quality/test-data/sanger_full_range_masked_N.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_joiner/test-data/split_pair_reads_1.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_joiner/test-data/split_pair_reads_2.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_joiner/test-data/3.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_deinterlacer/test-data/paired_end_merged_errors.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_deinterlacer/test-data/paired_end_1_cleaned.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_deinterlacer/test-data/paired_end_2_cleaned.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_deinterlacer/test-data/paired_end_1_cleaned_singles.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_deinterlacer/test-data/paired_end_2_cleaned_singles.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_interlacer/test-data/paired_end_1_errors.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_interlacer/test-data/paired_end_2_errors.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_interlacer/test-data/paired_end_merged_cleaned.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_paired_end_interlacer/test-data/paired_end_merged_cleaned_singles.fastqsanger
+    tool_collections/galaxy_sequence_utils/fastq_stats/test-data/fastq_stats1.fastq
+    tool_collections/galaxy_sequence_utils/fastq_stats/test-data/fastq_stats_1_out.tabular
 )
 
 

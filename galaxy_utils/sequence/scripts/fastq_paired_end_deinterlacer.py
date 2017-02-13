@@ -30,7 +30,7 @@ def main():
     i = None
     skip_count = 0
     found = {}
-    for i, read in enumerate(fastqReader(open(input_filename, 'rb'), format=type)):
+    for i, read in enumerate(fastqReader(path=input_filename, format=type)):
 
         if read.identifier in found:
             del found[read.identifier]

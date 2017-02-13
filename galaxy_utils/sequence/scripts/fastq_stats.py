@@ -24,7 +24,7 @@ def main():
     fastq_read = None
     for num_reads, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
         aggregator.consume_read(fastq_read)
-    out = open(output_filename, 'wb')
+    out = open(output_filename, 'w')
     valid_nucleotides = VALID_NUCLEOTIDES
     if fastq_read:
         if fastq_read.sequence_space == 'base':

@@ -51,7 +51,7 @@ def exclude_and_compare(aggregate_action, aggregate_list, operator, threshold_va
 def main():
     usage = "usage: %prog [options] input_file output_file"
     parser = OptionParser(usage=usage)
-    parser.add_option('-f', '--format', dest='format', type='choice', default='sanger', choices=('sanger', 'cssanger', 'solexa', 'illumina'), help='FASTQ variant type')
+    parser.add_option('-f', '--format', dest='format', type='choice', default='sanger', choices=('sanger', 'cssanger', 'solexa', 'illumina', 'sanger.gz', 'cssanger.gz', 'solexa.gz', 'illumina.gz', 'sanger.bz2', 'cssanger.bz2', 'solexa.bz2', 'illumina.bz2'), help='FASTQ variant type')
     parser.add_option('-s', '--window_size', type="int", dest='window_size', default='1', help='Window size')
     parser.add_option('-t', '--window_step', type="int", dest='window_step', default='1', help='Window step')
     parser.add_option('-e', '--trim_ends', type="choice", dest='trim_ends', default='53', choices=('5', '3', '53', '35'), help='Ends to Trim')
