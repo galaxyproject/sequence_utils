@@ -6,7 +6,7 @@ History
 .. to_doc
 
 ---------------------
-1.1.0.dev0
+1.1.0 (2017-02-13)
 ---------------------
 
 * Support gz and bzip2 compressed files.
