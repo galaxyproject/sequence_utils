@@ -10,7 +10,7 @@ from galaxy_utils.sequence.fastq import (
 )
 
 VALID_NUCLEOTIDES = ['A', 'C', 'G', 'T', 'N']
-VALID_COLOR_SPACE = map(str, range(7)) + ['.']
+VALID_COLOR_SPACE = list(map(str, range(7))) + ['.']
 SUMMARY_STAT_ORDER = ['read_count', 'min_score', 'max_score', 'sum_score', 'mean_score', 'q1', 'med_score', 'q3', 'iqr', 'left_whisker', 'right_whisker']
 
 
