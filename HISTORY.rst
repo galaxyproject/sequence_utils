@@ -9,7 +9,10 @@ History
 1.1.0.dev0
 ---------------------
 
-    
+* Support gz and bzip2 compressed files.
+  `Pull Request 11`_
+* Move wrapper scripts for Galaxy tools into this project and install as part of setup.py.
+  `Pull Request 11`_
 
 ---------------------
 1.0.2 (2017-02-02)
@@ -43,3 +46,4 @@ https://github.com/galaxyproject/sequence_utils/pull/2
 .. _5e9bfc0: https://github.com/galaxyproject/sequence_utils/commit/5e9bfc0
 .. _Pull Request 4: https://github.com/galaxyproject/sequence_utils/pull/4
 .. _Pull Request 3: https://github.com/galaxyproject/sequence_utils/pull/3
+.. _Pull Request 11: https://github.com/galaxyproject/sequence_utils/pull/11
