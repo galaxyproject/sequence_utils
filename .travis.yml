@@ -18,7 +18,6 @@ install:
 
 matrix:
   allow_failures:
-    - env: TOX_ENV=py34
     - env: TOX_ENV=py27-lint-docstrings
 
 script: tox -e $TOX_ENV

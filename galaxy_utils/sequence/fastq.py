@@ -1,14 +1,23 @@
 # Dan Blankenberg
 from __future__ import print_function
 
+import bz2
+import gzip
 import math
 import string
+
+import six
 
 from six import Iterator, string_types
 
 from . import transform
 from .fasta import fastaSequence
 from .sequence import SequencingRead
+
+if six.PY2:
+    LETTERS = string.letters
+else:
+    LETTERS = string.ascii_letters
 
 
 class fastqSequencingRead( SequencingRead ):
@@ -283,7 +292,7 @@ class fastqCSSangerRead( fastqSequencingRead ):
         return fastqSequencingRead.__len__( self )
 
     def has_adapter_base( self ):
-        if self.sequence and self.sequence[0] in string.letters:  # adapter base must be a letter
+        if self.sequence and self.sequence[0] in LETTERS:  # adapter base must be a letter
             return True
         return False
 
@@ -368,6 +377,8 @@ class fastqCSSangerRead( fastqSequencingRead ):
 FASTQ_FORMATS = {}
 for format in [ fastqIlluminaRead, fastqSolexaRead, fastqSangerRead, fastqCSSangerRead ]:
     FASTQ_FORMATS[ format.format ] = format
+    FASTQ_FORMATS[ format.format + ".gz" ] = format
+    FASTQ_FORMATS[ format.format + ".bz2" ] = format
 
 
 class fastqAggregator( object ):
@@ -534,11 +545,36 @@ class fastqAggregator( object ):
         return column_stats
 
 
+def _fastq_open_stream(fh=None, format="sanger", path=None):
+    if fh is None:
+        assert path is not None
+        if format.endswith(".gz"):
+            fh = gzip.open(path, mode="rt")
+        elif format.endswith(".bz2"):
+            if six.PY3:
+                fh = bz2.open(path, mode="rt")
+            else:
+                fh = bz2.BZ2File(path, mode="r")
+        else:
+            fh = open(path, "rt")
+    else:
+        if format.endswith(".gz"):
+            fh = gzip.GzipFile(fileobj=fh, mode="r")
+        elif format.endswith(".bz2"):
+            assert False, "bz2 formats do not support file handle inputs"
+    return fh
+
+
 class fastqReader( Iterator ):
-    def __init__( self, fh, format='sanger', apply_galaxy_conventions=False ):
-        self.file = fh
+    def __init__( self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None ):
+        fh = _fastq_open_stream(fh=fh, format=format, path=path)
+        self._set_file_handle(fh)
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
+
+    def _set_file_handle(self, fh):
+        # Extension point for subclasses to wrap file handler
+        self.file = fh
 
     def close( self ):
         return self.file.close()
@@ -596,11 +632,18 @@ class ReadlineCountFile( object ):
 class fastqVerboseErrorReader( fastqReader ):
     MAX_PRINT_ERROR_BYTES = 1024
 
-    def __init__( self, fh, **kwds ):
-        super( fastqVerboseErrorReader, self ).__init__( ReadlineCountFile( fh ), **kwds  )
+    def __init__( self, fh=None, **kwds ):
+        super( fastqVerboseErrorReader, self ).__init__( fh=fh, **kwds  )
         self.last_good_identifier = None
 
+    def _set_file_handle(self, fh):
+        # Extension point for subclasses to wrap file handler
+        self.file = ReadlineCountFile( fh )
+
     def __next__( self ):
+        if not hasattr(self.file, "readline_count"):
+            return super( fastqVerboseErrorReader, self ).__next__()
+
         last_good_end_offset = self.file.tell()
         last_readline_count = self.file.readline_count
         try:
@@ -625,7 +668,8 @@ class fastqVerboseErrorReader( fastqReader ):
 
 
 class fastqNamedReader( object ):
-    def __init__( self, fh, format='sanger', apply_galaxy_conventions=False ):
+    def __init__( self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None ):
+        fh = _fastq_open_stream(fh=fh, format=format, path=path)
         self.file = fh
         self.format = format
         self.reader = fastqReader( self.file, self.format )
@@ -696,7 +740,23 @@ class fastqNamedReader( object ):
 
 
 class fastqWriter( object ):
-    def __init__( self, fh, format=None, force_quality_encoding=None ):
+    def __init__( self, fh=None, format=None, force_quality_encoding=None, path=None ):
+        if fh is None:
+            assert path is not None
+            if format.endswith(".gz"):
+                fh = gzip.open(path, "wt")
+            elif format.endswith(".bz2"):
+                if six.PY2:
+                    fh = bz2.BZ2File(path, mode="w")
+                else:
+                    fh = bz2.open(path, mode="wt")
+            else:
+                fh = open(path, "wt")
+        else:
+            if format.endswith(".gz"):
+                fh = gzip.GzipFile(fileobj=fh)
+            elif format.endswith(".bz2"):
+                assert False, "bz2 formats do not support file handle inputs"
         self.file = fh
         self.format = format
         self.force_quality_encoding = force_quality_encoding

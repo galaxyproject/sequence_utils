@@ -2,12 +2,19 @@
 import string
 from copy import deepcopy
 
+import six
+
 from . import transform
+
+if six.PY2:
+    LETTERS = string.letters
+else:
+    LETTERS = string.ascii_letters
 
 
 class SequencingRead( object ):
     color_space_converter = transform.ColorSpaceConverter()
-    valid_sequence_list = string.letters
+    valid_sequence_list = LETTERS
 
     def __init__( self ):
         self.identifier = None

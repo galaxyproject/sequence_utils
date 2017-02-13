@@ -8,7 +8,7 @@ shopt -s nullglob
 SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd )"
 
 # Planemo to install for test.
-PLANEMO_INSTALL_TARGET="${PLANEMO_INSTALL_TARGET:-planemo==0.37.0}"
+PLANEMO_INSTALL_TARGET="${PLANEMO_INSTALL_TARGET:-planemo==0.38.0}"
 
 # By default use pyton setup.py install to install the library.
 SETUP_COMMAND="${SETUP_COMMAND:-install}"
@@ -52,7 +52,7 @@ then
         TOOLS_DEVTEAM="$TEMP_DIR/tools-devteam"
         git clone https://github.com/galaxyproject/tools-devteam.git "$TOOLS_DEVTEAM"
     fi
-    TARGET_TOOL_DIRS=(tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner tool_collections/galaxy_sequence_utils/fastq_manipulation)
+    TARGET_TOOL_DIRS=(tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner tool_collections/galaxy_sequence_utils/fastq_manipulation tool_collections/galaxy_sequence_utils/fastq_groomer tool_collections/galaxy_sequence_utils/fastq_filter)
 else
     TARGET_TOOL_DIRS=("$1")
 fi

@@ -32,8 +32,25 @@ PROJECT_DESCRIPTION = 'Galaxy utilities for manipulating sequences Galaxy projec
 PACKAGES = [
     'galaxy_utils',
     'galaxy_utils.sequence',
+    'galaxy_utils.sequence.scripts',
 ]
-ENTRY_POINTS = ''''''
+ENTRY_POINTS = '''
+        [console_scripts]
+        gx-fastq-to-tabular=galaxy_utils.sequence.scripts.fastq_to_tabular:main
+        gx-fastq-groomer=galaxy_utils.sequence.scripts.fastq_groomer:main
+        gx-fastq-combiner=galaxy_utils.sequence.scripts.fastq_combiner:main
+        gx-fastq-filter=galaxy_utils.sequence.scripts.fastq_filter:main
+        gx-fastq-manipulation=galaxy_utils.sequence.scripts.fastq_manipulation:main
+        gx-fastq-masker-by-quality=galaxy_utils.sequence.scripts.fastq_masker_by_quality:main
+        gx-fastq-paired-end-deinterlacer=galaxy_utils.sequence.scripts.fastq_paired_end_deinterlacer:main
+        gx-fastq-paired-end-interlacer=galaxy_utils.sequence.scripts.fastq_paired_end_interlacer:main
+        gx-fastq-paired-end-joiner=galaxy_utils.sequence.scripts.fastq_paired_end_joiner:main
+        gx-fastq-paired-end-splitter=galaxy_utils.sequence.scripts.fastq_paired_end_splitter:main
+        gx-fastq-stats=galaxy_utils.sequence.scripts.fastq_stats:main
+        gx-fastq-to-fasta=galaxy_utils.sequence.scripts.fastq_to_fasta:main
+        gx-fastq-trimmer=galaxy_utils.sequence.scripts.fastq_trimmer:main
+        gx-fastq-trimmer-by-quality=galaxy_utils.sequence.scripts.fastq_trimmer_by_quality:main
+'''
 PACKAGE_DATA = {}
 PACKAGE_DIR = {
     SOURCE_DIR: SOURCE_DIR,
@@ -77,6 +94,11 @@ setup(
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     test_suite=TEST_DIR,
     tests_require=test_requirements
