@@ -1,8 +1,6 @@
 # Dan Blankenberg
 from __future__ import print_function
 
-import string
-
 from optparse import OptionParser
 
 from galaxy_utils.sequence.fastq import fastqReader, fastqWriter
@@ -73,7 +71,7 @@ def main():
     score_comparer = get_score_comparer( options.score_comparison )
 
     if options.lowercase:
-        base_masker = string.lower
+        base_masker = str.lower
     else:
         base_masker = BaseReplacer( options.mask_character )
 
