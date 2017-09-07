@@ -1,5 +1,9 @@
 # Dan Blankenberg
-from six import string_types
+import bz2
+import gzip
+
+import six
+from six import Iterator, string_types
 
 
 class fastaSequence( object ):
@@ -14,14 +18,14 @@ class fastaSequence( object ):
         return "%s\n%s\n" % ( self.identifier, self.sequence )
 
 
-class fastaReader( object ):
+class fastaReader( Iterator ):
     def __init__( self, fh ):
         self.file = fh
 
     def close( self ):
         return self.file.close()
 
-    def next( self ):
+    def __next__( self ):
         line = self.file.readline()
         # remove header comment lines
         while line and line.startswith( '#' ):
@@ -50,7 +54,7 @@ class fastaReader( object ):
 
     def __iter__( self ):
         while True:
-            yield self.next()
+            yield next(self)
 
 
 class fastaNamedReader( object ):
@@ -73,13 +77,13 @@ class fastaNamedReader( object ):
             if not self.offset_dict[ sequence_id ]:
                 del self.offset_dict[ sequence_id ]
             self.file.seek( seq_offset )
-            rval = self.reader.next()
+            rval = next(self.reader)
             self.file.seek( initial_offset )
         else:
             while True:
                 offset = self.file.tell()
                 try:
-                    fasta_seq = self.reader.next()
+                    fasta_seq = next(self.reader)
                 except StopIteration:
                     self.eof = True
                     break  # eof, id not found, will return None
@@ -102,7 +106,7 @@ class fastaNamedReader( object ):
         if not eof:
             offset = self.file.tell()
             try:
-                self.reader.next()
+                next(self.reader)
             except StopIteration:
                 eof = True
             self.file.seek( offset )
@@ -114,12 +118,28 @@ class fastaNamedReader( object ):
 
 
 class fastaWriter( object ):
-    def __init__( self, fh ):
+    def __init__(self, fh=None, format=None, path=None):
+        if fh is None:
+            assert path is not None
+            if format.endswith(".gz"):
+                fh = gzip.open(path, "wt")
+            elif format.endswith(".bz2"):
+                if six.PY2:
+                    fh = bz2.BZ2File(path, mode="w")
+                else:
+                    fh = bz2.open(path, mode="wt")
+            else:
+                fh = open(path, "wt")
+        else:
+            if format.endswith(".gz"):
+                fh = gzip.GzipFile(fileobj=fh)
+            elif format.endswith(".bz2"):
+                assert False, "bz2 formats do not support file handle inputs"
         self.file = fh
 
-    def write( self, fastq_read ):
+    def write( self, fasta_read ):
         # this will include color space adapter base if applicable
-        self.file.write( ">%s\n%s\n" % ( fastq_read.identifier[1:], fastq_read.sequence ) )
+        self.file.write( ">%s\n%s\n" % ( fasta_read.identifier[1:], fasta_read.sequence ) )
 
     def close( self ):
         return self.file.close()
