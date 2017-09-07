@@ -13,8 +13,8 @@ from galaxy_utils.sequence.fastq import fastqReader, fastqWriter
 if six.PY3:
 
     def execfile(path, vars):
-        with open("somefile.py") as f:
-            code = compile(f.read(), "somefile.py", 'exec')
+        with open(path) as f:
+            code = compile(f.read(), path, 'exec')
             exec(code, vars)
 
 
