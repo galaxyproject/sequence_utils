@@ -5,8 +5,6 @@ import sys
 
 from tempfile import mkdtemp
 
-import six
-
 from galaxy_utils.sequence.scripts import (
     fastq_combiner,
     fastq_groomer,
@@ -125,10 +123,6 @@ def test_fastq_paired_end_interlacer():
 
 
 def test_fastq_stats():
-    if not six.PY2:
-        # Python 3 prints more digits of various floating point numbers and so the output is more percise.
-        return
-
     i_path = _data_path("fastq_stats1.fastq")
     o_path = _data_path("fastq_stats_1_out.tabular")
     with _new_argv([i_path, "output", "sanger"]):
