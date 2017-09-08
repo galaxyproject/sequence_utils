@@ -34,13 +34,13 @@ def main():
             valid_nucleotides = VALID_COLOR_SPACE
     for i in range(aggregator.get_max_read_length()):
         column_stats = aggregator.get_summary_statistics_for_column(i)
-        out.write('%i\t' % (i + 1))
-        out.write('%s\t' * len(SUMMARY_STAT_ORDER) % tuple([column_stats[key] for key in SUMMARY_STAT_ORDER]))
+        out.write('%d\t' % (i + 1))
+        out.write("%d\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%d\t%d\t" % tuple(column_stats[key] for key in SUMMARY_STAT_ORDER))
         out.write('%s\t' % ','.join(map(str, column_stats['outliers'])))
         base_counts = aggregator.get_base_counts_for_column(i)
         for nuc in valid_nucleotides:
             out.write("%s\t" % base_counts.get(nuc, 0))
-        extra_nucs = sorted([nuc for nuc in base_counts.keys() if nuc not in valid_nucleotides])
+        extra_nucs = sorted(nuc for nuc in base_counts.keys() if nuc not in valid_nucleotides)
         out.write("%s\t%s\n" % (','.join(extra_nucs), ','.join(str(base_counts[nuc]) for nuc in extra_nucs)))
     out.close()
     if num_reads is None:

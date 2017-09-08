@@ -15,7 +15,7 @@ def main():
 
     num_reads = None
     fastq_read = None
-    out = fastaWriter(path=output_filename)
+    out = fastaWriter(path=output_filename, format="fasta")
     for num_reads, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
         out.write(fastq_read)
     out.close()

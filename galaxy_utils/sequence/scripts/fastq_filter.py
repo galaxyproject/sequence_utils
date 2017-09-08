@@ -37,7 +37,7 @@ def main():
     i = None
     reads_kept = 0
     execfile(script_filename, globals())
-    for i, fastq_read in enumerate( fastqReader( open( input_filename ), format=input_type ) ):
+    for i, fastq_read in enumerate( fastqReader( path=input_filename, format=input_type ) ):
         ret_val = fastq_read_pass_filter( fastq_read )  # fastq_read_pass_filter defined in script_filename  # NOQA
         if ret_val:
             out.write( fastq_read )
