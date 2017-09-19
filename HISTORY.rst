@@ -6,10 +6,14 @@ History
 .. to_doc
 
 ---------------------
-1.2.0.dev0
+1.1.1 (2017-09-19)
 ---------------------
 
-    
+* Fix fastq_filter.py , fastq_masker_by_quality.py , fastq_stats.py and
+  fastq_to_fasta.py wrapper scripts
+ `Pull Request 14`_
+* Fix fastq_filter.py wrapper script
+ `Pull Request 13`_
 
 ---------------------
 1.1.0 (2017-02-13)
@@ -53,3 +57,5 @@ https://github.com/galaxyproject/sequence_utils/pull/2
 .. _Pull Request 4: https://github.com/galaxyproject/sequence_utils/pull/4
 .. _Pull Request 3: https://github.com/galaxyproject/sequence_utils/pull/3
 .. _Pull Request 11: https://github.com/galaxyproject/sequence_utils/pull/11
+.. _Pull Request 13: https://github.com/galaxyproject/sequence_utils/pull/13
+.. _Pull Request 14: https://github.com/galaxyproject/sequence_utils/pull/14

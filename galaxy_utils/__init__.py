@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '1.2.0.dev0'
+__version__ = '1.1.1'
 
 
 PROJECT_NAME = "galaxy_sequence_utils"
