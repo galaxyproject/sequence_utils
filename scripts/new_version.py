@@ -39,7 +39,7 @@ def main(argv):
 %s.dev0
 ---------------------
 
-    """ % new_version)
+""" % new_version)
     open(history_path, "w").write(history)
 
     source_mod_path = os.path.join(PROJECT_DIRECTORY, source_dir, "__init__.py")
