@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 install: ## install into Python environment
 	python setup.py install
 
-setup-venv: ## setup a development virutalenv in current directory
+setup-venv: ## setup a development virtualenv in current directory
 	if [ ! -d $(VENV) ]; then virtualenv $(VENV); exit; fi;
 	$(IN_VENV) pip install -r requirements.txt && pip install -r dev-requirements.txt
 
@@ -116,7 +116,7 @@ open-project: ## open project on github
 	$(OPEN_RESOURCE) $(PROJECT_URL)
 
 dist: clean ## package
-	$(IN_VENV) python setup.py sdist bdist_egg bdist_wheel
+	$(IN_VENV) python setup.py sdist bdist_wheel
 	ls -l dist
 
 release-test-artifacts: dist ## Package and Upload to Test PyPi
