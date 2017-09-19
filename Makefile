@@ -46,7 +46,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 
-install: ## install into Python envirnoment
+install: ## install into Python environment
 	python setup.py install
 
 setup-venv: ## setup a development virutalenv in current directory
@@ -123,7 +123,7 @@ release-test-artifacts: dist ## Package and Upload to Test PyPi
 	$(IN_VENV) twine upload -r test dist/*
 	$(OPEN_RESOURCE) https://testpypi.python.org/pypi/$(PROJECT_NAME)
 
-release-aritfacts: release-test-artifacts ## Package and Upload to PyPi
+release-artifacts: release-test-artifacts ## Package and Upload to PyPi
 	@while [ -z "$$CONTINUE" ]; do \
 		read -r -p "Have you executed release-test and reviewed results? [y/N]: " CONTINUE; \
 	done ; \
@@ -137,7 +137,7 @@ commit-version: ## Update version and history, commit.
 new-version: ## Mint a new version
 	$(IN_VENV) python $(BUILD_SCRIPTS_DIR)/new_version.py $(SOURCE_DIR) $(VERSION)
 
-release-local: commit-version release-aritfacts new-version
+release-local: commit-version release-artifacts new-version
 
 push-release: ## Push a tagged release to github
 	git push $(UPSTREAM) master
