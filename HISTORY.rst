@@ -11,9 +11,9 @@ History
 
 * Fix fastq_filter.py , fastq_masker_by_quality.py , fastq_stats.py and
   fastq_to_fasta.py wrapper scripts
- `Pull Request 14`_
+  `Pull Request 14`_
 * Fix fastq_filter.py wrapper script
- `Pull Request 13`_
+  `Pull Request 13`_
 
 ---------------------
 1.1.0 (2017-02-13)
