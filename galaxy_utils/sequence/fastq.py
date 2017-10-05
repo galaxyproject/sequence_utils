@@ -60,9 +60,9 @@ class fastqSequencingRead(SequencingRead):
         cls_quality_min = cls.quality_min
         for i in range(len(decimal_score_list)):
             score = decimal_score_list[i]
-            if(score > cls_quality_max):
+            if score > cls_quality_max:
                 transformed_score = cls_quality_max
-            elif(score < cls_quality_min):
+            elif score < cls_quality_min:
                 transformed_score = cls_quality_min
             else:
                 transformed_score = score
@@ -75,9 +75,9 @@ class fastqSequencingRead(SequencingRead):
         to_quality = cls.ascii_min - cls.quality_min
         for i in range(len(decimal_score_list)):
             score = decimal_score_list[i]
-            if(score > cls_quality_max):
+            if score > cls_quality_max:
                 transformed_score = cls_quality_max
-            elif(score < cls_quality_min):
+            elif score < cls_quality_min:
                 transformed_score = cls_quality_min
             else:
                 transformed_score = score
@@ -305,7 +305,7 @@ class fastqCSSangerRead(fastqSequencingRead):
         if self.has_adapter_base():
             qual_len = self.get_ascii_quality_scores_len()
             seq_len = len(self.sequence)
-            assert (qual_len + 1 == seq_len) or (qual_len == seq_len), "Invalid FASTQ file: quality score length (%i) does not match sequence length (%i with adapter base)" % (qual_len, seq_len)  # SRA adds FAKE/DUMMY quality scores to the adapter base, we'll allow the reading of the Improper score here, but remove it in the Reader when "apply_galaxy_conventions" is set to True
+            assert qual_len + 1 == seq_len or qual_len == seq_len, "Invalid FASTQ file: quality score length (%i) does not match sequence length (%i with adapter base)" % (qual_len, seq_len)  # SRA adds FAKE/DUMMY quality scores to the adapter base, we'll allow the reading of the Improper score here, but remove it in the Reader when "apply_galaxy_conventions" is set to True
         else:
             return fastqSequencingRead.assert_sequence_quality_lengths(self)
 
@@ -503,9 +503,9 @@ class fastqAggregator(object):
             for pos in q1_pos:
                 q3_pos.append(max(med_pos) + 1 + pos)
         # get scores at position
-        med_score = float(sum([self.get_score_at_position_for_column(i, pos) for pos in med_pos])) / float(len(med_pos))
-        q1 = float(sum([self.get_score_at_position_for_column(i, pos) for pos in q1_pos])) / float(len(q1_pos))
-        q3 = float(sum([self.get_score_at_position_for_column(i, pos) for pos in q3_pos])) / float(len(q3_pos))
+        med_score = float(sum(self.get_score_at_position_for_column(i, pos) for pos in med_pos)) / float(len(med_pos))
+        q1 = float(sum(self.get_score_at_position_for_column(i, pos) for pos in q1_pos)) / float(len(q1_pos))
+        q3 = float(sum(self.get_score_at_position_for_column(i, pos) for pos in q3_pos)) / float(len(q3_pos))
         # determine iqr and step
         iqr = q3 - q1
         step = 1.5 * iqr
@@ -561,7 +561,7 @@ def _fastq_open_stream(fh=None, format="sanger", path=None):
         if format.endswith(".gz"):
             fh = gzip.GzipFile(fileobj=fh, mode="r")
         elif format.endswith(".bz2"):
-            assert False, "bz2 formats do not support file handle inputs"
+            raise Exception("bz2 formats do not support file handle inputs")
     return fh
 
 
@@ -748,7 +748,7 @@ class fastqWriter(object):
             if format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh)
             elif format.endswith(".bz2"):
-                assert False, "bz2 formats do not support file handle inputs"
+                raise Exception("bz2 formats do not support file handle inputs")
         self.file = fh
         self.format = format
         self.force_quality_encoding = force_quality_encoding
@@ -770,7 +770,7 @@ class fastqJoiner(object):
         outformat = fastqSequencingRead.get_class_by_format(format)
         self.paste_sequence = paste
         self.paste_ascii_quality = chr(outformat.ascii_max) * len(paste)
-        self.paste_decimal_quality = " ".join([str(outformat.quality_max) for x in range(len(paste))])
+        self.paste_decimal_quality = " ".join(str(outformat.quality_max) for x in range(len(paste)))
 
     def join(self, read1, read2):
         read1_id, read1_sep, read1_desc = read1.identifier.partition(' ')

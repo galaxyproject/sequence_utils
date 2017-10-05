@@ -134,7 +134,7 @@ class fastaWriter(object):
             if format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh)
             elif format.endswith(".bz2"):
-                assert False, "bz2 formats do not support file handle inputs"
+                raise Exception("bz2 formats do not support file handle inputs")
         self.file = fh
 
     def write(self, fasta_read):
