@@ -12,10 +12,10 @@ import textwrap
 
 PROJECT_DIRECTORY = os.path.join(os.path.dirname(__file__), "..")
 new_path = [PROJECT_DIRECTORY]
-new_path.extend( sys.path[1:] )  # remove scripts/ from the path
+new_path.extend(sys.path[1:])  # remove scripts/ from the path
 sys.path = new_path
 
-import galaxy_utils as project
+import galaxy_utils as project  # noqa: E402
 
 PROJECT_OWNER = project.PROJECT_OWNER
 PROJECT_NAME = project.PROJECT_NAME
@@ -29,7 +29,7 @@ def main(argv):
 
     def extend(from_str, line):
         from_str += "\n"
-        return history.replace(from_str, from_str + line + "\n" )
+        return history.replace(from_str, from_str + line + "\n")
 
     ident = argv[1]
 
@@ -88,6 +88,7 @@ def wrap(message):
     wrapper.subsequent_indent = '  '
     wrapper.width = 78
     return "\n".join(wrapper.wrap(message))
+
 
 if __name__ == "__main__":
     main(sys.argv)
