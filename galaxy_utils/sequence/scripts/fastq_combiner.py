@@ -34,20 +34,20 @@ def main():
     elif qual_type == 'qualillumina':
         format = 'illumina'
 
-    out = fastqWriter( path=output_filename, format=format, force_quality_encoding=force_quality_encoding )
+    out = fastqWriter(path=output_filename, format=format, force_quality_encoding=force_quality_encoding)
     if qual_filename == 'None':
-        qual_input = fastqFakeFastaScoreReader( format, quality_encoding=force_quality_encoding )
+        qual_input = fastqFakeFastaScoreReader(format, quality_encoding=force_quality_encoding)
     else:
-        qual_input = fastaNamedReader( open( qual_filename, 'rt' )  )
+        qual_input = fastaNamedReader(open(qual_filename, 'rt'))
 
-    fastq_combiner = fastqCombiner( format )
+    fastq_combiner = fastqCombiner(format)
     i = None
     skip_count = 0
-    for i, sequence in enumerate( fastaReader( open( fasta_filename, 'rt' ) ) ):
-        quality = qual_input.get( sequence )
+    for i, sequence in enumerate(fastaReader(open(fasta_filename, 'rt'))):
+        quality = qual_input.get(sequence)
         if quality:
-            fastq_read = fastq_combiner.combine( sequence, quality )
-            out.write( fastq_read )
+            fastq_read = fastq_combiner.combine(sequence, quality)
+            out.write(fastq_read)
         else:
             skip_count += 1
     out.close()
@@ -55,7 +55,7 @@ def main():
         print("Your file contains no valid FASTA sequences.")
     else:
         print(qual_input.has_data())
-        print('Combined %s of %s sequences with quality scores (%.2f%%).' % ( i - skip_count + 1, i + 1, float( i - skip_count + 1 ) / float( i + 1 ) * 100.0 ))
+        print('Combined %s of %s sequences with quality scores (%.2f%%).' % (i - skip_count + 1, i + 1, float(i - skip_count + 1) / float(i + 1) * 100.0))
 
 
 if __name__ == "__main__":

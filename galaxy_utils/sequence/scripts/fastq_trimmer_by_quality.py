@@ -11,7 +11,7 @@ def mean(score_list):
     return float(sum(score_list)) / float(len(score_list))
 
 
-ACTION_METHODS = { 'min': min, 'max': max, 'sum': sum, 'mean': mean }
+ACTION_METHODS = {'min': min, 'max': max, 'sum': sum, 'mean': mean}
 
 
 def compare(aggregated_value, operator, threshold_value):
@@ -80,18 +80,18 @@ def main():
             for exclude_list in last_exclude_indexes:
                 for window_index in range(options.window_size):
                     if window_index not in exclude_list:
-                        new_exclude = sorted(exclude_list + [ window_index ])
+                        new_exclude = sorted(exclude_list + [window_index])
                         if new_exclude not in exclude_window_indexes + new_exclude_indexes:
                             new_exclude_indexes.append(new_exclude)
             exclude_window_indexes += new_exclude_indexes
             last_exclude_indexes = new_exclude_indexes
         else:
             for window_index in range(options.window_size):
-                last_exclude_indexes.append([ window_index ])
+                last_exclude_indexes.append([window_index])
             exclude_window_indexes = list(last_exclude_indexes)
 
     out = fastqWriter(path=args[1], format=options.format)
-    action = ACTION_METHODS[ options.aggregation_action ]
+    action = ACTION_METHODS[options.aggregation_action]
 
     num_reads = None
     num_reads_excluded = 0
@@ -105,7 +105,7 @@ def main():
                         fastq_read.sequence = ''
                         fastq_read.quality = ''
                         break
-                    if exclude_and_compare(action, quality_list[ lwindow_position:lwindow_position + options.window_size ], options.score_comparison, options.quality_score, exclude_window_indexes):
+                    if exclude_and_compare(action, quality_list[lwindow_position:lwindow_position + options.window_size], options.score_comparison, options.quality_score, exclude_window_indexes):
                         fastq_read = fastq_read.slice(lwindow_position, None)
                         break
                     lwindow_position += options.window_step
@@ -117,7 +117,7 @@ def main():
                         fastq_read.sequence = ''
                         fastq_read.quality = ''
                         break
-                    if exclude_and_compare(action, quality_list[ lwindow_position:rwindow_position ], options.score_comparison, options.quality_score, exclude_window_indexes):
+                    if exclude_and_compare(action, quality_list[lwindow_position:rwindow_position], options.score_comparison, options.quality_score, exclude_window_indexes):
                         fastq_read = fastq_read.slice(None, rwindow_position)
                         break
                     rwindow_position -= options.window_step
