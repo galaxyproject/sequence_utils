@@ -667,19 +667,11 @@ class fastqVerboseErrorReader( fastqReader ):
             raise e
 
 
-class fastqNamedReader( object ):
+class fastqNamedReader(fastqReader):
     def __init__( self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None ):
-        fh = _fastq_open_stream(fh=fh, format=format, path=path)
-        self.file = fh
-        self.format = format
-        self.reader = fastqReader( self.file, self.format )
-        # self.last_offset = self.file.tell()
+        super(fastqNamedReader, self).__init__(fh=fh, format=format, apply_galaxy_conventions=apply_galaxy_conventions, path=path)
         self.offset_dict = {}
         self.eof = False
-        self.apply_galaxy_conventions = apply_galaxy_conventions
-
-    def close( self ):
-        return self.file.close()
 
     def get( self, sequence_identifier ):
         # Input is either a sequence ID or a sequence object
@@ -695,14 +687,14 @@ class fastqNamedReader( object ):
             if not self.offset_dict[ sequence_id ]:
                 del self.offset_dict[ sequence_id ]
             self.file.seek( seq_offset )
-            rval = next(self.reader)
+            rval = next(self)
             # assert rval.id == sequence_id, 'seq id mismatch' #should be able to remove this
             self.file.seek( initial_offset )
         else:
             while True:
                 offset = self.file.tell()
                 try:
-                    fastq_read = next(self.reader)
+                    fastq_read = next(self)
                 except StopIteration:
                     self.eof = True
                     break  # eof, id not found, will return None
@@ -728,7 +720,7 @@ class fastqNamedReader( object ):
         if not eof:
             offset = self.file.tell()
             try:
-                next(self.reader)
+                next(self)
             except StopIteration:
                 eof = True
             self.file.seek( offset )
