@@ -747,7 +747,7 @@ class fastqWriter(object):
         else:
             if format and format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh)
-            elif format.endswith(".bz2"):
+            elif format and format.endswith(".bz2"):
                 raise Exception("bz2 formats do not support file handle inputs")
         self.file = fh
         self.format = format
