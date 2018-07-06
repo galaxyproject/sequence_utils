@@ -6,6 +6,13 @@ History
 .. to_doc
 
 ---------------------
+1.1.3 (2018-07-06)
+---------------------
+
+* Cope with default ``format=None`` in ``fastaWriter`` and ``fastqWriter``
+  `Pull Request 16`_
+
+---------------------
 1.1.2 (2017-10-05)
 ---------------------
 
@@ -70,3 +77,4 @@ History
 .. _Pull Request 13: https://github.com/galaxyproject/sequence_utils/pull/13
 .. _Pull Request 14: https://github.com/galaxyproject/sequence_utils/pull/14
 .. _Pull Request 15: https://github.com/galaxyproject/sequence_utils/pull/15
+.. _Pull Request 16: https://github.com/galaxyproject/sequence_utils/pull/16

@@ -11,8 +11,6 @@ except ImportError:
 
 SOURCE_DIR = "galaxy_utils"
 
-_version_re = re.compile(r'__version__\s+=\s+(.*)')
-
 with open('%s/__init__.py' % SOURCE_DIR, 'rb') as f:
     init_contents = f.read().decode('utf-8')
 
