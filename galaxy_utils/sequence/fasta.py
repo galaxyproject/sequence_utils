@@ -121,9 +121,9 @@ class fastaWriter(object):
     def __init__(self, fh=None, format=None, path=None):
         if fh is None:
             assert path is not None
-            if format.endswith(".gz"):
+            if format and format.endswith(".gz"):
                 fh = gzip.open(path, "wt")
-            elif format.endswith(".bz2"):
+            elif format and format.endswith(".bz2"):
                 if six.PY2:
                     fh = bz2.BZ2File(path, mode="w")
                 else:
@@ -131,9 +131,9 @@ class fastaWriter(object):
             else:
                 fh = open(path, "wt")
         else:
-            if format.endswith(".gz"):
+            if format and format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh)
-            elif format.endswith(".bz2"):
+            elif format and format.endswith(".bz2"):
                 raise Exception("bz2 formats do not support file handle inputs")
         self.file = fh
 
