@@ -57,6 +57,7 @@ class fastaReader(Iterator):
             try:
                 yield next(self)
             except StopIteration:
+                self.close()
                 # Catch exception and return normally
                 return
 
