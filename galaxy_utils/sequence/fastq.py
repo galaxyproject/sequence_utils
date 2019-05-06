@@ -613,7 +613,11 @@ class fastqReader(Iterator):
 
     def __iter__(self):
         while True:
-            yield next(self)
+            try:
+                yield next(self)
+            except StopIteration:
+                # Catch exception and return normally
+                return
 
 
 class ReadlineCountFile(object):
