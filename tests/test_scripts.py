@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 
 from galaxy_utils.sequence.fastq import fastqReader
 from galaxy_utils.sequence.fasta import fastaReader
+from galaxy_utils.sequence.vcf import Reader as vcfReader
 from galaxy_utils.sequence.scripts import (
     fastq_combiner,
     fastq_groomer,
@@ -39,6 +40,16 @@ def test_fastq_reader_cleanup():
     fh = open(i_path)
     with _new_argv([fh]):
         reader = fastqReader(fh)
+        for _ in reader:
+            pass
+    assert(fh.closed)
+
+
+def test_vcf_reader_cleanup():
+    i_path = _data_path("vcf_reader_1.vcf")
+    fh = open(i_path, "rt")
+    with _new_argv([fh]):
+        reader = vcfReader(fh)
         for _ in reader:
             pass
     assert(fh.closed)
