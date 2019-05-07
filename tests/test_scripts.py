@@ -25,6 +25,14 @@ TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
 
 
+# TODO/WIP: this is expected to fail for now.
+def test_fastq_groomer_inconsistent_id():
+    i_path = _data_path("fastq_groomer_inconsistent_id")
+    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input']):
+        fastq_groomer.main()
+        _assert_paths_equal("output", i_path)
+
+
 def test_fasta_reader_cleanup():
     i_path = _data_path("fasta_reader_1.fasta")
     fh = open(i_path)
