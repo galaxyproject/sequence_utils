@@ -110,6 +110,9 @@ class Reader(object):
             if metadata_name == 'fileformat':
                 self.vcf_class = VariantCall.get_class_by_format(metadata_value)
 
+    def close(self):
+        return self.vcf_file.close()
+
     def next(self):
         line = self.vcf_file.readline()
         if not line:
@@ -118,4 +121,10 @@ class Reader(object):
 
     def __iter__(self):
         while True:
-            yield self.next()
+            try:
+                yield self.next()
+            except StopIteration:
+                self.close()
+                # Catch exception and return normally
+                return
+

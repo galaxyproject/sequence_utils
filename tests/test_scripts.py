@@ -5,6 +5,9 @@ import sys
 
 from tempfile import mkdtemp
 
+from galaxy_utils.sequence.fastq import fastqReader
+from galaxy_utils.sequence.fasta import fastaReader
+from galaxy_utils.sequence.vcf import Reader as vcfReader
 from galaxy_utils.sequence.scripts import (
     fastq_combiner,
     fastq_groomer,
@@ -20,6 +23,36 @@ from galaxy_utils.sequence.scripts import (
 
 TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
+
+
+def test_fasta_reader_cleanup():
+    i_path = _data_path("fasta_reader_1.fasta")
+    fh = open(i_path)
+    with _new_argv([fh]):
+        reader = fastaReader(fh)
+        for _ in reader:
+            pass
+    assert(fh.closed)
+
+
+def test_fastq_reader_cleanup():
+    i_path = _data_path("sanger_full_range_original_sanger.fastqsanger")
+    fh = open(i_path)
+    with _new_argv([fh]):
+        reader = fastqReader(fh)
+        for _ in reader:
+            pass
+    assert(fh.closed)
+
+
+def test_vcf_reader_cleanup():
+    i_path = _data_path("vcf_reader_1.vcf")
+    fh = open(i_path, "rt")
+    with _new_argv([fh]):
+        reader = vcfReader(fh)
+        for _ in reader:
+            pass
+    assert(fh.closed)
 
 
 def test_fastq_to_tabular():
