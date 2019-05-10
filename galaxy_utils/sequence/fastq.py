@@ -566,11 +566,14 @@ def _fastq_open_stream(fh=None, format="sanger", path=None):
 
 
 class fastqReader(Iterator):
-    def __init__(self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None):
+    def __init__(
+            self, fh=None, format='sanger', apply_galaxy_conventions=False, 
+            path=None, fix_id=False):
         fh = _fastq_open_stream(fh=fh, format=format, path=path)
         self._set_file_handle(fh)
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
+        self.fix_id = fix_id # fix inconsistent identifiers (source: SRA data dumps)
 
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
@@ -580,36 +583,69 @@ class fastqReader(Iterator):
         return self.file.close()
 
     def __next__(self):
-        while True:
-            fastq_header = self.file.readline()
-            if not fastq_header:
-                raise StopIteration
-            fastq_header = fastq_header.rstrip('\n\r')
-            # remove empty lines, apparently extra new lines at end of file is common?
-            if fastq_header:
-                break
-
-        assert fastq_header.startswith('@'), 'Invalid fastq header: %s' % fastq_header
         rval = fastqSequencingRead.get_class_by_format(self.format)()
-        rval.identifier = fastq_header
+
+        id_line = self._read_fastq_header() # We need the raw line1 to compare w/line3
+        rval.identifier = id_line
+
+        self._read_fastq_sequence(rval, id_line)
+        self._read_fastq_qualityscores(rval)
+
+        rval.assert_sequence_quality_lengths()
+        if self.apply_galaxy_conventions:
+            rval.apply_galaxy_conventions()
+
+        return rval
+
+    def _read_fastq_header(self):
         while True:
             line = self.file.readline()
             if not line:
-                raise Exception('Invalid FASTQ file: could not find quality score of sequence identifier %s.' % rval.identifier)
+                raise StopIteration
             line = line.rstrip('\n\r')
-            if line.startswith('+') and (len(line) == 1 or line[1:].startswith(fastq_header[1:])):
-                rval.description = line
+            if line:
                 break
-            rval.append_sequence(line)
+
+        if not line.startswith('@'):
+            self.close()
+            raise fastqFormatError('Invalid FASTQ header: %s' % line)
+
+        return line
+
+    def _read_fastq_sequence(self, rval, id_line):
+        while True:
+            line = self.file.readline()
+            if not line:
+                self.close()
+                raise fastqFormatError(
+                    'Invalid FASTQ file: could not find quality score of \
+                    sequence identifier %s.' % rval.identifier) 
+            line = line.rstrip('\n\r')
+
+            if not line.startswith('+'):
+                rval.append_sequence(line)
+            else: # Sequence is over, read the quality score identifier
+                if len(line) == 1 or line[1:] == id_line[1:]: # Line is valid
+                    rval.description = line
+                    break
+                elif self.fix_id: # Line is not valid, but we must fix it
+                    rval.description = '+'
+                    break
+                else: # Line is not valid, sound the alarm!
+                    self.close()
+                    raise fastqFormatError(
+                        'Invalid FASTQ file: quality score identifier (%s) \
+                        does not match sequence identifier (%s).' \
+                        % (line, rval.identifier))
+
+    def _read_fastq_qualityscores(self, rval):
         while rval.insufficient_quality_length():
             line = self.file.readline()
             if not line:
                 break
+
+            line = line.rstrip('\n\r')
             rval.append_quality(line)
-        rval.assert_sequence_quality_lengths()
-        if self.apply_galaxy_conventions:
-            rval.apply_galaxy_conventions()
-        return rval
 
     def __iter__(self):
         while True:
@@ -899,3 +935,7 @@ class fastqFakeFastaScoreReader(object):
 
     def has_data(self):
         return ''  # No actual data exist, none can be remaining
+
+
+class fastqFormatError(Exception):
+    pass
