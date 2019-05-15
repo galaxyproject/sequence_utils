@@ -5,7 +5,7 @@ import sys
 
 from tempfile import mkdtemp
 
-from galaxy_utils.sequence.fastq import fastqReader
+from galaxy_utils.sequence.fastq import fastqReader, fastqFormatError
 from galaxy_utils.sequence.fasta import fastaReader
 from galaxy_utils.sequence.vcf import Reader as vcfReader
 from galaxy_utils.sequence.scripts import (
@@ -23,6 +23,13 @@ from galaxy_utils.sequence.scripts import (
 
 TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
+
+
+def test_fastq_groomer_fix_inconsistent_id():
+    #TODO add more/better tests for groomer
+    i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', 'fix_id']):
+        fastq_groomer.main()
 
 
 def test_fasta_reader_cleanup():
@@ -205,3 +212,8 @@ class _TempDirectoryContext(object):
 
     def __exit__(self, type, value, tb):
         shutil.rmtree(self.temp_directory)
+
+
+
+if __name__ == '__main__':
+    test_fastq_groomer_inconsistent_id()
