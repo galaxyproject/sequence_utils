@@ -25,11 +25,12 @@ TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
 
 
-def test_fastq_groomer_fix_inconsistent_id():
-    #TODO add more/better tests for groomer
-    i_path = _data_path('test_data/fastqreader_min_invalid-line3')
-    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', 'fix_id']):
-        fastq_groomer.main()
+# This test is diabled for an intermediate commit that does not include the new fix_id option.
+# It should be enabled (possibly, modified) in the following commit.
+#def test_fastq_groomer_fix_inconsistent_id():
+#    i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+#    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', 'fix_id']):
+#        fastq_groomer.main()
 
 
 def test_fasta_reader_cleanup():
@@ -213,7 +214,3 @@ class _TempDirectoryContext(object):
     def __exit__(self, type, value, tb):
         shutil.rmtree(self.temp_directory)
 
-
-
-if __name__ == '__main__':
-    test_fastq_groomer_inconsistent_id()
