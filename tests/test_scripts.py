@@ -25,12 +25,12 @@ TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
 
 
-# This test is diabled for an intermediate commit that does not include the new fix_id option.
-# It should be enabled (possibly, modified) in the following commit.
-#def test_fastq_groomer_fix_inconsistent_id():
-#    i_path = _data_path('test_data/fastqreader_min_invalid-line3')
-#    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', 'fix_id']):
-#        fastq_groomer.main()
+def test_fastq_groomer_fix_inconsistent_id():
+    i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+    o_path = _data_path('test_data/fastqreader_min_invalid-line3_fixed')
+    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--fix_id']):
+        fastq_groomer.main()
+        _assert_paths_equal("output", o_path)
 
 
 def test_fasta_reader_cleanup():
