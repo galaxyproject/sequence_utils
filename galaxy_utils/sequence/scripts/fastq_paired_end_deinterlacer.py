@@ -17,6 +17,10 @@ class Deinterlacer():
     def run(self, input_filename, type, mate1_filename, mate2_filename, 
             single1_filename, single2_filename):
 
+        # temporary fix (note to self: refactor argument processing)
+        if not type: 
+            type = 'sanger'
+
         input = fastqNamedReader(path=input_filename, format=type)
         mate1_out = fastqWriter(path=mate1_filename, format=type)
         mate2_out = fastqWriter(path=mate2_filename, format=type)
