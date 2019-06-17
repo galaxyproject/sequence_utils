@@ -107,8 +107,7 @@ class FastqGroomerTestCase(unittest.TestCase):
 
         with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--no-fix-id']):
             with self.assertRaises(fastqFormatError):
-                g = Groomer()
-                g.set_file_handle(fh)
+                g = Groomer(fh)
                 g.run()
 
         self.assertTrue(

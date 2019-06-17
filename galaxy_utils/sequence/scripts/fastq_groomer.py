@@ -13,7 +13,8 @@ from galaxy_utils.sequence.fastq import (
 
 class Groomer():
 
-    def __init__(self):
+    def __init__(self, file_handle=None):
+        self.file_handle = file_handle
         args = self._get_args()
         self.input_filename = args.input_filename
         self.input_type = args.input_type
@@ -25,12 +26,6 @@ class Groomer():
 
         if self.force_quality_encoding == 'None':
             self.force_quality_encoding = None
-
-        self.file_handle = None
-
-    def set_file_handle(self, fh):
-        # required for testing (test file closed on error)
-        self.file_handle = fh
 
     def run(self):
         aggregator = fastqAggregator()
