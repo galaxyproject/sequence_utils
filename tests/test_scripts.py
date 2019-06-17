@@ -2,12 +2,11 @@ import contextlib
 import os
 import shutil
 import sys
-
+import unittest
 from tempfile import mkdtemp
 
-from galaxy_utils.sequence.fastq import fastqReader, fastqFormatError
 from galaxy_utils.sequence.fasta import fastaReader
-from galaxy_utils.sequence.vcf import Reader as vcfReader
+from galaxy_utils.sequence.fastq import fastqReader
 from galaxy_utils.sequence.scripts import (
     fastq_combiner,
     fastq_groomer,
@@ -20,15 +19,80 @@ from galaxy_utils.sequence.scripts import (
     fastq_to_tabular,
     fastq_trimmer_by_quality,
 )
+from galaxy_utils.sequence.scripts.fastq_groomer import Groomer
+from galaxy_utils.sequence.vcf import Reader as vcfReader
 
 TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = TEST_DIR
 
 
-def test_fastq_groomer_fix_inconsistent_id():
+class FastqGroomerTestCase(unittest.TestCase):
+
+    def test_args_all(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'ascii', 'summarize_input', '--fix-id']
+        with _new_argv(args):
+            g = Groomer()
+            self.assertEqual('i_file', g.input_filename)
+            self.assertEqual('sanger', g.input_type)
+            self.assertEqual('o_file', g.output_filename)
+            self.assertEqual('sanger.gz', g.output_type)
+            self.assertEqual('ascii', g.force_quality_encoding)
+            self.assertTrue(g.summarize_input)
+            self.assertTrue(g.fix_id)
+
+    def test_args_force_qual_enc_none(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--fix-id']
+        with _new_argv(args):
+            g = Groomer()
+            self.assertIsNone(g.force_quality_encoding)
+
+    def test_args_input_type_illegal_choice(self):
+        args = ['i_file', 'ILLEGAL', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--fix-id']
+        with _new_argv(args):
+            with self.assertRaises(SystemExit):
+                Groomer()
+
+    def test_args_output_type_illegal_choice(self):
+        args = ['i_file', 'sanger', 'o_file', 'ILLEGAL', 'None', 'summarize_input', '--fix-id']
+        with _new_argv(args):
+            with self.assertRaises(SystemExit):
+                Groomer()
+
+    def test_args_force_qual_enc_illegal_choice(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'ILLEGAL', 'summarize_input', '--fix-id']
+        with _new_argv(args):
+            with self.assertRaises(SystemExit):
+                Groomer()
+
+    def test_args_summarize_imput_illegal_choice(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'ILLEAGAL', '--fix-id']
+        with _new_argv(args):
+            with self.assertRaises(SystemExit):
+                Groomer()
+
+    def test_args_fixid_default(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input']
+        with _new_argv(args):
+            g = Groomer()
+            self.assertTrue(g.fix_id)
+
+    def test_args_fixid_yes(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--fix-id']
+        with _new_argv(args):
+            g = Groomer()
+            self.assertTrue(g.fix_id)
+
+    def test_args_fixid_no(self):
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--no-fix-id']
+        with _new_argv(args):
+            g = Groomer()
+            self.assertFalse(g.fix_id)
+
+
+def test_fix_inconsistent_id():
     i_path = _data_path('test_data/fastqreader_min_invalid-line3')
     o_path = _data_path('test_data/fastqreader_min_invalid-line3_fixed')
-    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--fix_id']):
+    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--fix-id']):
         fastq_groomer.main()
         _assert_paths_equal("output", o_path)
 
@@ -213,4 +277,3 @@ class _TempDirectoryContext(object):
 
     def __exit__(self, type, value, tb):
         shutil.rmtree(self.temp_directory)
-
