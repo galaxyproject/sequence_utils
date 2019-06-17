@@ -7,7 +7,6 @@ import math
 import string
 
 import six
-
 from six import Iterator, string_types
 
 from . import transform
@@ -567,13 +566,13 @@ def _fastq_open_stream(fh=None, format="sanger", path=None):
 
 class fastqReader(Iterator):
     def __init__(
-            self, fh=None, format='sanger', apply_galaxy_conventions=False, 
+            self, fh=None, format='sanger', apply_galaxy_conventions=False,
             path=None, fix_id=False):
         fh = _fastq_open_stream(fh=fh, format=format, path=path)
         self._set_file_handle(fh)
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
-        self.fix_id = fix_id # fix inconsistent identifiers (source: SRA data dumps)
+        self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
 
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
@@ -582,10 +581,14 @@ class fastqReader(Iterator):
     def close(self):
         return self.file.close()
 
+    def _close_on_error(self):
+        # Extension point for subclasses (fastqVerboseErrorReader needs file access after error)
+        return self.close()
+
     def __next__(self):
         rval = fastqSequencingRead.get_class_by_format(self.format)()
 
-        id_line = self._read_fastq_header() # We need the raw line1 to compare w/line3
+        id_line = self._read_fastq_header()  # We need the raw line1 to compare w/line3
         rval.identifier = id_line
 
         self._read_fastq_sequence(rval, id_line)
@@ -619,23 +622,23 @@ class fastqReader(Iterator):
                 self.close()
                 raise fastqFormatError(
                     'Invalid FASTQ file: could not find quality score of \
-                    sequence identifier %s.' % rval.identifier) 
+                    sequence identifier %s.' % rval.identifier)
             line = line.rstrip('\n\r')
 
             if not line.startswith('+'):
                 rval.append_sequence(line)
-            else: # Sequence is over, read the quality score identifier
-                if len(line) == 1 or line[1:] == id_line[1:]: # Line is valid
+            else:  # Sequence is over, read the quality score identifier
+                if len(line) == 1 or line[1:] == id_line[1:]:  # Line is valid
                     rval.description = line
                     break
-                elif self.fix_id: # Line is not valid, but we must fix it
+                elif self.fix_id:  # Line is not valid, but we must fix it
                     rval.description = '+'
                     break
-                else: # Line is not valid, sound the alarm!
-                    self.close()
+                else:  # Line is not valid, sound the alarm!
+                    self._close_on_error()
                     raise fastqFormatError(
                         'Invalid FASTQ file: quality score identifier (%s) \
-                        does not match sequence identifier (%s).' \
+                        does not match sequence identifier (%s).'
                         % (line, rval.identifier))
 
     def _read_fastq_qualityscores(self, rval):
@@ -677,6 +680,9 @@ class fastqVerboseErrorReader(fastqReader):
         super(fastqVerboseErrorReader, self).__init__(fh=fh, **kwds)
         self.last_good_identifier = None
 
+    def _close_on_error(self):
+        pass  # Do not close it yet: need file access to provide error details (see __next__())
+
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
         self.file = ReadlineCountFile(fh)
@@ -705,6 +711,7 @@ class fastqVerboseErrorReader(fastqReader):
             print("The error in your file occurs between lines '%i' and '%i', which corresponds to byte-offsets '%i' and '%i', and contains the text (%i of %i bytes shown):\n" % (last_readline_count + 1, self.file.readline_count, last_good_end_offset, error_offset, print_error_bytes, error_byte_count))
             self.file.seek(last_good_end_offset)
             print(self.file.read(print_error_bytes))
+            self.file.close()
             raise e
 
 

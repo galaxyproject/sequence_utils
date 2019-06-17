@@ -26,6 +26,12 @@ class Groomer():
         if self.force_quality_encoding == 'None':
             self.force_quality_encoding = None
 
+        self.file_handle = None
+
+    def set_file_handle(self, fh):
+        # required for testing (test file closed on error)
+        self.file_handle = fh
+
     def run(self):
         aggregator = fastqAggregator()
         out = fastqWriter(
@@ -36,8 +42,8 @@ class Groomer():
         else:
             reader_type = fastqReader
         reader = reader_type(
-            path=self.input_filename, format=self.input_type, apply_galaxy_conventions=True,
-            fix_id=self.fix_id)
+            fh=self.file_handle, path=self.input_filename, format=self.input_type,
+            apply_galaxy_conventions=True, fix_id=self.fix_id)
         read_count = None
 
         for read_count, fastq_read in enumerate(reader):

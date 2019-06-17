@@ -6,7 +6,7 @@ import unittest
 from tempfile import mkdtemp
 
 from galaxy_utils.sequence.fasta import fastaReader
-from galaxy_utils.sequence.fastq import fastqReader
+from galaxy_utils.sequence.fastq import fastqFormatError, fastqReader
 from galaxy_utils.sequence.scripts import (
     fastq_combiner,
     fastq_groomer,
@@ -65,7 +65,7 @@ class FastqGroomerTestCase(unittest.TestCase):
                 Groomer()
 
     def test_args_summarize_imput_illegal_choice(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'ILLEAGAL', '--fix-id']
+        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'ILLEGAL', '--fix-id']
         with _new_argv(args):
             with self.assertRaises(SystemExit):
                 Groomer()
@@ -88,13 +88,32 @@ class FastqGroomerTestCase(unittest.TestCase):
             g = Groomer()
             self.assertFalse(g.fix_id)
 
+    def test_fix_inconsistent_id(self):
+        i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+        o_path = _data_path('test_data/fastqreader_min_invalid-line3_fixed')
+        with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--fix-id']):
+            fastq_groomer.main()
+            _assert_paths_equal("output", o_path)
 
-def test_fix_inconsistent_id():
-    i_path = _data_path('test_data/fastqreader_min_invalid-line3')
-    o_path = _data_path('test_data/fastqreader_min_invalid-line3_fixed')
-    with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--fix-id']):
-        fastq_groomer.main()
-        _assert_paths_equal("output", o_path)
+    def test_donot_fix_inconsistent_id(self):
+        i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+        with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--no-fix-id']):
+            with self.assertRaises(fastqFormatError):
+                fastq_groomer.main()
+
+    def test_file_closed_on_inconsistent_id_error(self):
+        i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+        fh = open(i_path)
+
+        with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--no-fix-id']):
+            with self.assertRaises(fastqFormatError):
+                g = Groomer()
+                g.set_file_handle(fh)
+                g.run()
+
+        self.assertTrue(
+            fh.closed,
+            'File should be closed if exception occurs due to inconsistent id')
 
 
 def test_fasta_reader_cleanup():
