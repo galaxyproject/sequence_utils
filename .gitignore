@@ -47,6 +47,3 @@ tool_test_output*
 docs/_build
 
 .venv
-
-# ctags file
-tags

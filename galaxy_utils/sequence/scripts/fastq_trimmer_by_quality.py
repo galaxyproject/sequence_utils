@@ -90,42 +90,44 @@ def main():
                 last_exclude_indexes.append([window_index])
             exclude_window_indexes = list(last_exclude_indexes)
 
-    out = fastqWriter(path=args[1], format=options.format)
-    action = ACTION_METHODS[options.aggregation_action]
-
     num_reads = None
     num_reads_excluded = 0
-    for num_reads, fastq_read in enumerate(fastqReader(path=args[0], format=options.format)):
-        for trim_end in options.trim_ends:
-            quality_list = fastq_read.get_decimal_quality_scores()
-            if trim_end == '5':
-                lwindow_position = 0  # left position of window
-                while True:
-                    if lwindow_position >= len(quality_list):
-                        fastq_read.sequence = ''
-                        fastq_read.quality = ''
-                        break
-                    if exclude_and_compare(action, quality_list[lwindow_position:lwindow_position + options.window_size], options.score_comparison, options.quality_score, exclude_window_indexes):
-                        fastq_read = fastq_read.slice(lwindow_position, None)
-                        break
-                    lwindow_position += options.window_step
+
+    writer = fastqWriter(path=args[1], format=options.format)
+    reader = fastqReader(path=args[0], format=options.format)
+    with writer, reader:
+        action = ACTION_METHODS[options.aggregation_action]
+        for num_reads, fastq_read in enumerate(reader):
+            for trim_end in options.trim_ends:
+                quality_list = fastq_read.get_decimal_quality_scores()
+                if trim_end == '5':
+                    lwindow_position = 0  # left position of window
+                    while True:
+                        if lwindow_position >= len(quality_list):
+                            fastq_read.sequence = ''
+                            fastq_read.quality = ''
+                            break
+                        if exclude_and_compare(action, quality_list[lwindow_position:lwindow_position + options.window_size], options.score_comparison, options.quality_score, exclude_window_indexes):
+                            fastq_read = fastq_read.slice(lwindow_position, None)
+                            break
+                        lwindow_position += options.window_step
+                else:
+                    rwindow_position = len(quality_list)  # right position of window
+                    while True:
+                        lwindow_position = rwindow_position - options.window_size  # left position of window
+                        if rwindow_position <= 0 or lwindow_position < 0:
+                            fastq_read.sequence = ''
+                            fastq_read.quality = ''
+                            break
+                        if exclude_and_compare(action, quality_list[lwindow_position:rwindow_position], options.score_comparison, options.quality_score, exclude_window_indexes):
+                            fastq_read = fastq_read.slice(None, rwindow_position)
+                            break
+                        rwindow_position -= options.window_step
+            if options.keep_zero_length or len(fastq_read):
+                writer.write(fastq_read)
             else:
-                rwindow_position = len(quality_list)  # right position of window
-                while True:
-                    lwindow_position = rwindow_position - options.window_size  # left position of window
-                    if rwindow_position <= 0 or lwindow_position < 0:
-                        fastq_read.sequence = ''
-                        fastq_read.quality = ''
-                        break
-                    if exclude_and_compare(action, quality_list[lwindow_position:rwindow_position], options.score_comparison, options.quality_score, exclude_window_indexes):
-                        fastq_read = fastq_read.slice(None, rwindow_position)
-                        break
-                    rwindow_position -= options.window_step
-        if options.keep_zero_length or len(fastq_read):
-            out.write(fastq_read)
-        else:
-            num_reads_excluded += 1
-    out.close()
+                num_reads_excluded += 1
+
     if num_reads is None:
         print("No valid FASTQ reads could be processed.")
     else:

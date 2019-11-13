@@ -29,23 +29,26 @@ class Groomer():
 
     def run(self):
         aggregator = fastqAggregator()
-        out = fastqWriter(
-            path=self.output_filename, format=self.output_type,
-            force_quality_encoding=self.force_quality_encoding)
+        reader_class = fastqReader
         if self.summarize_input:
-            reader_type = fastqVerboseErrorReader
-        else:
-            reader_type = fastqReader
-        reader = reader_type(
-            fh=self.file_handle, path=self.input_filename, format=self.input_type,
-            apply_galaxy_conventions=True, fix_id=self.fix_id)
+            reader_class = fastqVerboseErrorReader
         read_count = None
 
-        for read_count, fastq_read in enumerate(reader):
-            if self.summarize_input:
-                aggregator.consume_read(fastq_read)
-            out.write(fastq_read)
-        out.close()
+        writer = fastqWriter(
+            path=self.output_filename,
+            format=self.output_type,
+            force_quality_encoding=self.force_quality_encoding)
+        reader = reader_class(
+            fh=self.file_handle,
+            path=self.input_filename,
+            format=self.input_type,
+            apply_galaxy_conventions=True,
+            fix_id=self.fix_id)
+        with writer, reader:
+            for read_count, fastq_read in enumerate(reader):
+                if self.summarize_input:
+                    aggregator.consume_read(fastq_read)
+                writer.write(fastq_read)
 
         self._print_output(read_count, aggregator)
 

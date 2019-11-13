@@ -129,9 +129,9 @@ def test_fastq_reader_cleanup():
     i_path = _data_path("sanger_full_range_original_sanger.fastqsanger")
     fh = open(i_path)
     with _new_argv([fh]):
-        reader = fastqReader(fh)
-        for _ in reader:
-            pass
+        with fastqReader(fh) as reader:
+            for _ in reader:
+                pass
     assert(fh.closed)
 
 

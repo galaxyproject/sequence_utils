@@ -565,14 +565,22 @@ def _fastq_open_stream(fh=None, format="sanger", path=None):
 
 
 class fastqReader(Iterator):
+
     def __init__(
-            self, fh=None, format='sanger', apply_galaxy_conventions=False,
-            path=None, fix_id=False):
-        fh = _fastq_open_stream(fh=fh, format=format, path=path)
-        self._set_file_handle(fh)
+            self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
+        self.fh = fh
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
+        self.path = path
         self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
+
+    def __enter__(self):
+        fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path)
+        self._set_file_handle(fh)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.file.close()
 
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
@@ -780,26 +788,35 @@ class fastqNamedReader(fastqReader):
 
 
 class fastqWriter(object):
+
     def __init__(self, fh=None, format=None, force_quality_encoding=None, path=None):
-        if fh is None:
-            assert path is not None
-            if format and format.endswith(".gz"):
-                fh = gzip.open(path, "wt")
-            elif format and format.endswith(".bz2"):
-                if six.PY2:
-                    fh = bz2.BZ2File(path, mode="w")
-                else:
-                    fh = bz2.open(path, mode="wt")
-            else:
-                fh = open(path, "wt")
-        else:
-            if format and format.endswith(".gz"):
-                fh = gzip.GzipFile(fileobj=fh)
-            elif format and format.endswith(".bz2"):
-                raise Exception("bz2 formats do not support file handle inputs")
-        self.file = fh
+        self.fh = fh
         self.format = format
         self.force_quality_encoding = force_quality_encoding
+        self.path = path
+
+    def __enter__(self):
+        if self.fh is None:
+            if self.format and self.format.endswith(".gz"):
+                self.fh = gzip.open(self.path, "wt")
+            elif self.format and self.format.endswith(".bz2"):
+                if six.PY2:
+                    self.fh = bz2.BZ2File(self.path, mode="w")
+                else:
+                    self.fh = bz2.open(self.path, mode="wt")
+            else:
+                self.fh = open(self.path, "wt")
+        else:
+            if self.format and self.format.endswith(".gz"):
+                self.fh = gzip.GzipFile(fileobj=self.fh)
+            elif self.format and self.format.endswith(".bz2"):
+                raise Exception("bz2 formats do not support file handle inputs")
+
+        self.file = self.fh
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
     def write(self, fastq_read):
         if self.format:

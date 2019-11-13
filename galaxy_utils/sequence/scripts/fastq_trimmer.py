@@ -16,26 +16,29 @@ def main():
     input_type = sys.argv[6] or 'sanger'
     keep_zero_length = sys.argv[7] == 'keep_zero_length'
 
-    out = fastqWriter(path=output_filename, format=input_type)
     num_reads_excluded = 0
     num_reads = None
-    for num_reads, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
-        if percent_offsets:
-            left_column_offset = int(round(float(left_offset) / 100.0 * float(len(fastq_read))))
-            right_column_offset = int(round(float(right_offset) / 100.0 * float(len(fastq_read))))
-        else:
-            left_column_offset = int(left_offset)
-            right_column_offset = int(right_offset)
-        if right_column_offset != 0:
-            right_column_offset = -right_column_offset
-        else:
-            right_column_offset = None
-        fastq_read = fastq_read.slice(left_column_offset, right_column_offset)
-        if keep_zero_length or len(fastq_read):
-            out.write(fastq_read)
-        else:
-            num_reads_excluded += 1
-    out.close()
+
+    writer = fastqWriter(path=output_filename, format=input_type)
+    reader = fastqReader(path=input_filename, format=input_type)
+    with writer, reader:
+        for num_reads, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
+            if percent_offsets:
+                left_column_offset = int(round(float(left_offset) / 100.0 * float(len(fastq_read))))
+                right_column_offset = int(round(float(right_offset) / 100.0 * float(len(fastq_read))))
+            else:
+                left_column_offset = int(left_offset)
+                right_column_offset = int(right_offset)
+            if right_column_offset != 0:
+                right_column_offset = -right_column_offset
+            else:
+                right_column_offset = None
+            fastq_read = fastq_read.slice(left_column_offset, right_column_offset)
+            if keep_zero_length or len(fastq_read):
+                writer.write(fastq_read)
+            else:
+                num_reads_excluded += 1
+
     if num_reads is None:
         print("No valid fastq reads could be processed.")
     else:

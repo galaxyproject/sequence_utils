@@ -23,18 +23,19 @@ def main():
     shutil.copy(script_filename, os.path.join(additional_files_path, 'debug.txt'))
 
     fastq_manipulator = imp.load_module('fastq_manipulator', open(script_filename), script_filename, ('', 'r', imp.PY_SOURCE))
-
-    out = fastqWriter(path=output_filename, format=input_type)
-
     i = None
     reads_manipulated = 0
-    for i, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
-        new_read = fastq_manipulator.match_and_manipulate_read(fastq_read)
-        if new_read:
-            out.write(new_read)
-        if new_read != fastq_read:
-            reads_manipulated += 1
-    out.close()
+
+    writer = fastqWriter(path=output_filename, format=input_type)
+    reader = fastqReader(path=input_filename, format=input_type)
+    with writer, reader:
+        for i, fastq_read in enumerate(reader):
+            new_read = fastq_manipulator.match_and_manipulate_read(fastq_read)
+            if new_read:
+                writer.write(new_read)
+            if new_read != fastq_read:
+                reads_manipulated += 1
+
     if i is None:
         print("Your file contains no valid FASTQ reads.")
     else:

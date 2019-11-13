@@ -30,19 +30,21 @@ def main():
     os.mkdir(additional_files_path)
     shutil.copy(script_filename, os.path.join(additional_files_path, 'debug.txt'))
 
-    # Dan, Others: Can we simply drop the "format=input_type" here since it is specified in reader.
-    # This optimization would cut runtime roughly in half (for my test case anyway). -John
-    out = fastqWriter(path=output_filename, format=input_type)
-
     i = None
     reads_kept = 0
     execfile(script_filename, globals())
-    for i, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
-        ret_val = fastq_read_pass_filter(fastq_read)  # fastq_read_pass_filter defined in script_filename  # NOQA
-        if ret_val:
-            out.write(fastq_read)
-            reads_kept += 1
-    out.close()
+
+    # Dan, Others: Can we simply drop the "format=input_type" here since it is specified in reader.
+    # This optimization would cut runtime roughly in half (for my test case anyway). -John
+    writer = fastqWriter(path=output_filename, format=input_type)
+    reader = fastqReader(path=input_filename, format=input_type)
+    with writer, reader:
+        for i, fastq_read in enumerate(reader):
+            ret_val = fastq_read_pass_filter(fastq_read)  # fastq_read_pass_filter defined in script_filename  # NOQA
+            if ret_val:
+                writer.write(fastq_read)
+                reads_kept += 1
+
     if i is None:
         print("Your file contains no valid fastq reads.")
     else:
