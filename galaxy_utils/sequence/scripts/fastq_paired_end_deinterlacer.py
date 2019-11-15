@@ -29,20 +29,20 @@ def main():
     mate2_out = fastqWriter(path=mate2_filename, format=type)
     single1_out = fastqWriter(path=single1_filename, format=type)
     single2_out = fastqWriter(path=single2_filename, format=type)
-    input = fastqNamedReader(path=input_filename, format=type)
-    reader = fastqReader(path=input_filename, format=type)
+    reader1 = fastqNamedReader(path=input_filename, format=type)
+    reader2 = fastqReader(path=input_filename, format=type)
 
-    with mate1_out, mate2_out, single1_out, single2_out, input, reader:
+    with mate1_out, mate2_out, single1_out, single2_out, reader1, reader2:
 
-        for i, read in enumerate(reader):
+        for i, read in enumerate(reader2):
 
             if read.identifier in found:
                 del found[read.identifier]
                 continue
 
-            mate1 = input.get(read.identifier)
+            mate1 = reader1.get(read.identifier)
 
-            mate2 = input.get(joiner.get_paired_identifier(mate1))
+            mate2 = reader1.get(joiner.get_paired_identifier(mate1))
 
             if mate2:
                 # This is a mate pair
@@ -67,8 +67,6 @@ def main():
         if skip_count:
             print('There were %i reads with no mate.' % skip_count)
         print('De-interlaced %s pairs of sequences.' % ((i - skip_count + 1) / 2))
-
-    input.close()
 
 
 if __name__ == "__main__":
