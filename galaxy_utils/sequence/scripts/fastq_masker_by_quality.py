@@ -75,16 +75,18 @@ def main():
     else:
         base_masker = BaseReplacer(options.mask_character)
 
-    out = fastqWriter(path=args[1], format=options.format)
-
     num_reads = None
-    for num_reads, fastq_read in enumerate(fastqReader(path=args[0], format=options.format)):
-        sequence_list = list(fastq_read.sequence)
-        for i, quality_score in enumerate(fastq_read.get_decimal_quality_scores()):
-            if score_comparer(quality_score, options.quality_score):
-                sequence_list[i] = base_masker(sequence_list[i])
-        fastq_read.sequence = "".join(sequence_list)
-        out.write(fastq_read)
+
+    writer = fastqWriter(path=args[1], format=options.format)
+    reader = fastqReader(path=args[0], format=options.format)
+    with writer, reader:
+        for num_reads, fastq_read in enumerate(reader):
+            sequence_list = list(fastq_read.sequence)
+            for i, quality_score in enumerate(fastq_read.get_decimal_quality_scores()):
+                if score_comparer(quality_score, options.quality_score):
+                    sequence_list[i] = base_masker(sequence_list[i])
+            fastq_read.sequence = "".join(sequence_list)
+            writer.write(fastq_read)
 
     if num_reads is not None:
         print("Processed %i %s reads." % (num_reads + 1, options.format))

@@ -7,7 +7,6 @@ import math
 import string
 
 import six
-
 from six import Iterator, string_types
 
 from . import transform
@@ -566,14 +565,22 @@ def _fastq_open_stream(fh=None, format="sanger", path=None):
 
 
 class fastqReader(Iterator):
+
     def __init__(
-            self, fh=None, format='sanger', apply_galaxy_conventions=False, 
-            path=None, fix_id=False):
-        fh = _fastq_open_stream(fh=fh, format=format, path=path)
-        self._set_file_handle(fh)
+            self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
+        self.fh = fh
         self.format = format
         self.apply_galaxy_conventions = apply_galaxy_conventions
-        self.fix_id = fix_id # fix inconsistent identifiers (source: SRA data dumps)
+        self.path = path
+        self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
+
+    def __enter__(self):
+        fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path)
+        self._set_file_handle(fh)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.file.close()
 
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
@@ -582,10 +589,14 @@ class fastqReader(Iterator):
     def close(self):
         return self.file.close()
 
+    def _close_on_error(self):
+        # Extension point for subclasses (fastqVerboseErrorReader needs file access after error)
+        return self.close()
+
     def __next__(self):
         rval = fastqSequencingRead.get_class_by_format(self.format)()
 
-        id_line = self._read_fastq_header() # We need the raw line1 to compare w/line3
+        id_line = self._read_fastq_header()  # We need the raw line1 to compare w/line3
         rval.identifier = id_line
 
         self._read_fastq_sequence(rval, id_line)
@@ -619,23 +630,23 @@ class fastqReader(Iterator):
                 self.close()
                 raise fastqFormatError(
                     'Invalid FASTQ file: could not find quality score of \
-                    sequence identifier %s.' % rval.identifier) 
+                    sequence identifier %s.' % rval.identifier)
             line = line.rstrip('\n\r')
 
             if not line.startswith('+'):
                 rval.append_sequence(line)
-            else: # Sequence is over, read the quality score identifier
-                if len(line) == 1 or line[1:] == id_line[1:]: # Line is valid
+            else:  # Sequence is over, read the quality score identifier
+                if len(line) == 1 or line[1:] == id_line[1:]:  # Line is valid
                     rval.description = line
                     break
-                elif self.fix_id: # Line is not valid, but we must fix it
+                elif self.fix_id:  # Line is not valid, but we must fix it
                     rval.description = '+'
                     break
-                else: # Line is not valid, sound the alarm!
-                    self.close()
+                else:  # Line is not valid, sound the alarm!
+                    self._close_on_error()
                     raise fastqFormatError(
                         'Invalid FASTQ file: quality score identifier (%s) \
-                        does not match sequence identifier (%s).' \
+                        does not match sequence identifier (%s).'
                         % (line, rval.identifier))
 
     def _read_fastq_qualityscores(self, rval):
@@ -677,6 +688,9 @@ class fastqVerboseErrorReader(fastqReader):
         super(fastqVerboseErrorReader, self).__init__(fh=fh, **kwds)
         self.last_good_identifier = None
 
+    def _close_on_error(self):
+        pass  # Do not close it yet: need file access to provide error details (see __next__())
+
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
         self.file = ReadlineCountFile(fh)
@@ -705,6 +719,7 @@ class fastqVerboseErrorReader(fastqReader):
             print("The error in your file occurs between lines '%i' and '%i', which corresponds to byte-offsets '%i' and '%i', and contains the text (%i of %i bytes shown):\n" % (last_readline_count + 1, self.file.readline_count, last_good_end_offset, error_offset, print_error_bytes, error_byte_count))
             self.file.seek(last_good_end_offset)
             print(self.file.read(print_error_bytes))
+            self.file.close()
             raise e
 
 
@@ -773,26 +788,35 @@ class fastqNamedReader(fastqReader):
 
 
 class fastqWriter(object):
+
     def __init__(self, fh=None, format=None, force_quality_encoding=None, path=None):
-        if fh is None:
-            assert path is not None
-            if format and format.endswith(".gz"):
-                fh = gzip.open(path, "wt")
-            elif format and format.endswith(".bz2"):
-                if six.PY2:
-                    fh = bz2.BZ2File(path, mode="w")
-                else:
-                    fh = bz2.open(path, mode="wt")
-            else:
-                fh = open(path, "wt")
-        else:
-            if format and format.endswith(".gz"):
-                fh = gzip.GzipFile(fileobj=fh)
-            elif format and format.endswith(".bz2"):
-                raise Exception("bz2 formats do not support file handle inputs")
-        self.file = fh
+        self.fh = fh
         self.format = format
         self.force_quality_encoding = force_quality_encoding
+        self.path = path
+
+    def __enter__(self):
+        if self.fh is None:
+            if self.format and self.format.endswith(".gz"):
+                self.fh = gzip.open(self.path, "wt")
+            elif self.format and self.format.endswith(".bz2"):
+                if six.PY2:
+                    self.fh = bz2.BZ2File(self.path, mode="w")
+                else:
+                    self.fh = bz2.open(self.path, mode="wt")
+            else:
+                self.fh = open(self.path, "wt")
+        else:
+            if self.format and self.format.endswith(".gz"):
+                self.fh = gzip.GzipFile(fileobj=self.fh)
+            elif self.format and self.format.endswith(".bz2"):
+                raise Exception("bz2 formats do not support file handle inputs")
+
+        self.file = self.fh
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
     def write(self, fastq_read):
         if self.format:

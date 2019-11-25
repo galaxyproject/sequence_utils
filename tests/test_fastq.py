@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from galaxy_utils.sequence.fastq import fastqReader, fastqFormatError
+from galaxy_utils.sequence.fastq import fastqFormatError, fastqReader
 
 TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = os.path.join(TEST_DIR, 'test_data')
@@ -12,38 +12,39 @@ class FastqReaderTestCase(unittest.TestCase):
     def test_file_closed_on_completion(self):
         i_path = _data_path('fastqreader_min')
         fh = open(i_path)
-        reader = fastqReader(fh)
-        for _ in reader:
-            pass
+        with fastqReader(fh) as reader:
+            for _ in reader:
+                pass
 
         self.assertTrue(
-            fh.closed, 
+            fh.closed,
             'File should be closed after iteration compeletes')
 
     def test_file_closed_on_header_error(self):
         i_path = _data_path('fastqreader_min_invalid-header')
         fh = open(i_path)
-        reader = fastqReader(fh)
 
-        with self.assertRaises(fastqFormatError):
-            for _ in reader:
-                pass
+        with fastqReader(fh) as reader:
+            with self.assertRaises(fastqFormatError):
+                for _ in reader:
+                    pass
+
         self.assertTrue(
-            fh.closed, 
+            fh.closed,
             'File should be closed if exception occurs due to invalid header')
 
     def test_invalid_header(self):
         i_path = _data_path('fastqreader_min_invalid-header')
-        reader = fastqReader(path=i_path)
 
-        with self.assertRaises(fastqFormatError):
-            for _ in reader:
-                pass
+        with fastqReader(path=i_path) as reader:
+            with self.assertRaises(fastqFormatError):
+                for _ in reader:
+                    pass
 
     def test_read_header(self):
         i_path = _data_path('fastqreader_min')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_headers = '@FAKE-1', '@FAKE-2'
@@ -54,8 +55,8 @@ class FastqReaderTestCase(unittest.TestCase):
 
     def test_read_sequence(self):
         i_path = _data_path('fastqreader_min')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_seqs = 'ACGTACGTAC', 'CATGCATGCA'
@@ -66,8 +67,8 @@ class FastqReaderTestCase(unittest.TestCase):
 
     def test_read_sequence_multiline(self):
         i_path = _data_path('fastqreader_min-multiline')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_seqs = 'ACGTACGTACGTACGTACGT', 'CATGCATGCATGCATGCATG'
@@ -78,8 +79,8 @@ class FastqReaderTestCase(unittest.TestCase):
 
     def test_read_qualityscores(self):
         i_path = _data_path('fastqreader_min')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_scores = '!##$%&&()*', '~}|{zyxwvu'
@@ -90,8 +91,8 @@ class FastqReaderTestCase(unittest.TestCase):
 
     def test_read_qualityscores_multiline(self):
         i_path = _data_path('fastqreader_min-multiline')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_scores = '!##$%&&()**,-./01234', '~}|{zyxwvutsrqponmlk'
@@ -103,12 +104,11 @@ class FastqReaderTestCase(unittest.TestCase):
     def test_read_qualityscores_edgecase_multiline(self):
         # Quality score input designed to confuse the parser
         i_path = _data_path('fastqreader_min-multiline-edgecase')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
-        expected_scores = ('+##$%&&()*+##$%&&()*@,-./01234', 
-            '@}|{zyxwvu@}|{zyxwvu+srqponmlk')
+        expected_scores = ('+##$%&&()*+##$%&&()*@,-./01234', '@}|{zyxwvu@}|{zyxwvu+srqponmlk')
 
         self.assertEqual(expected_reads, len(rvals))
         self.assertEqual(expected_scores[0], rvals[0].quality)
@@ -117,8 +117,8 @@ class FastqReaderTestCase(unittest.TestCase):
     def test_read_line3(self):
         # Separate test case for line3 containing a copy of line1
         i_path = _data_path('fastqreader_min-line3')
-        reader = fastqReader(path=i_path)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_seqs = 'ACGTACGTAC', 'CATGCATGCA'
@@ -131,29 +131,27 @@ class FastqReaderTestCase(unittest.TestCase):
 
     def test_invalid_line3(self):
         i_path = _data_path('fastqreader_min_invalid-line3')
-        reader = fastqReader(path=i_path)
-
-        with self.assertRaises(fastqFormatError):
-            for _ in reader:
-                pass
+        with fastqReader(path=i_path) as reader:
+            with self.assertRaises(fastqFormatError):
+                for _ in reader:
+                    pass
 
     def test_file_closed_on_line3_error(self):
-       i_path = _data_path('fastqreader_min_invalid-line3')
-       fh = open(i_path)
-       reader = fastqReader(fh)
-
-       with self.assertRaises(fastqFormatError):
-           for _ in reader:
-               pass
-       self.assertTrue(
-           fh.closed, 
-           'File should be closed if exception occurs due to invalid line3')
+        i_path = _data_path('fastqreader_min_invalid-line3')
+        fh = open(i_path)
+        with fastqReader(fh) as reader:
+            with self.assertRaises(fastqFormatError):
+                for _ in reader:
+                    pass
+        self.assertTrue(
+            fh.closed,
+            'File should be closed if exception occurs due to invalid line3')
 
     def test_invalid_line3_stripped(self):
         i_path = _data_path('fastqreader_min_invalid-line3')
         # fix_id=True: fix inconsistent identifiers (source: SRA data dumps)k
-        reader = fastqReader(path=i_path, fix_id=True)
-        rvals = [rval for rval in reader]
+        with fastqReader(path=i_path, fix_id=True) as reader:
+            rvals = [rval for rval in reader]
 
         expected_reads = 2
         expected_seqs = 'ACGTACGTAC', 'CATGCATGCA'

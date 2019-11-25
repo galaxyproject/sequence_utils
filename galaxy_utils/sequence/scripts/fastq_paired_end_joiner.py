@@ -86,8 +86,7 @@ class FastqJoiner(fq.fastqJoiner):
         if rval.sequence_space == 'color':
             # convert to nuc space, join, then convert back
             rval.sequence = rval.convert_base_to_color_space(
-                read1.convert_color_to_base_space(read1.sequence) +
-                self.paste_sequence +
+                read1.convert_color_to_base_space(read1.sequence) + self.paste_sequence +
                 read2.convert_color_to_base_space(read2.sequence)
             )
         else:
@@ -139,24 +138,28 @@ def main():
     else:
         joiner = fq.fastqJoiner(input1_type, paste=paste)
     # --
-    input2 = fq.fastqNamedReader(path=input2_filename, format=input2_type)
-    out = fq.fastqWriter(path=output_filename, format=input1_type)
     i = None
     skip_count = 0
-    for i, fastq_read in enumerate(fq.fastqReader(path=input1_filename, format=input1_type)):
-        identifier = joiner.get_paired_identifier(fastq_read)
-        fastq_paired = input2.get(identifier)
-        if fastq_paired is None:
-            skip_count += 1
-        else:
-            out.write(joiner.join(fastq_read, fastq_paired))
-    out.close()
 
-    if i is None:
-        print("Your file contains no valid FASTQ reads.")
-    else:
-        print(input2.has_data())
-        print('Joined %s of %s read pairs (%.2f%%).' % (i - skip_count + 1, i + 1, (i - skip_count + 1) / (i + 1) * 100.0))
+    writer = fq.fastqWriter(path=output_filename, format=input1_type)
+    reader1 = fq.fastqReader(path=input1_filename, format=input1_type)
+    reader2 = fq.fastqNamedReader(path=input2_filename, format=input2_type)
+
+    with writer, reader1, reader2:
+        for i, fastq_read in enumerate(reader1):
+            identifier = joiner.get_paired_identifier(fastq_read)
+            fastq_paired = reader2.get(identifier)
+            if fastq_paired is None:
+                skip_count += 1
+            else:
+                writer.write(joiner.join(fastq_read, fastq_paired))
+
+        # this indent is correct: we still need access to reader2
+        if i is None:
+            print("Your file contains no valid FASTQ reads.")
+        else:
+            print(reader2.has_data())
+            print('Joined %s of %s read pairs (%.2f%%).' % (i - skip_count + 1, i + 1, (i - skip_count + 1) / (i + 1) * 100.0))
 
 
 if __name__ == "__main__":

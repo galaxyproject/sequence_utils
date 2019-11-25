@@ -22,8 +22,9 @@ def main():
     aggregator = fastqAggregator()
     num_reads = None
     fastq_read = None
-    for num_reads, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
-        aggregator.consume_read(fastq_read)
+    with fastqReader(path=input_filename, format=input_type) as reader:
+        for num_reads, fastq_read in enumerate(reader):
+            aggregator.consume_read(fastq_read)
     out = open(output_filename, 'w')
     valid_nucleotides = VALID_NUCLEOTIDES
     if fastq_read:

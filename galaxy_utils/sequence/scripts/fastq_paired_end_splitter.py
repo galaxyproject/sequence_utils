@@ -18,20 +18,21 @@ def main():
     output2_filename = sys.argv[4]
 
     splitter = fastqSplitter()
-    out1 = fastqWriter(path=output1_filename, format=input_type)
-    out2 = fastqWriter(path=output2_filename, format=input_type)
-
     i = None
     skip_count = 0
-    for i, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
-        read1, read2 = splitter.split(fastq_read)
-        if read1 and read2:
-            out1.write(read1)
-            out2.write(read2)
-        else:
-            skip_count += 1
-    out1.close()
-    out2.close()
+
+    writer1 = fastqWriter(path=output1_filename, format=input_type)
+    writer2 = fastqWriter(path=output2_filename, format=input_type)
+    reader = fastqReader(path=input_filename, format=input_type)
+    with writer1, writer2, reader:
+        for i, fastq_read in enumerate(reader):
+            read1, read2 = splitter.split(fastq_read)
+            if read1 and read2:
+                writer1.write(read1)
+                writer2.write(read2)
+            else:
+                skip_count += 1
+
     if i is None:
         print("Your file contains no valid FASTQ reads.")
     else:

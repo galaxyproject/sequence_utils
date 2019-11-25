@@ -34,7 +34,6 @@ def main():
     elif qual_type == 'qualillumina':
         format = 'illumina'
 
-    out = fastqWriter(path=output_filename, format=format, force_quality_encoding=force_quality_encoding)
     if qual_filename == 'None':
         qual_input = fastqFakeFastaScoreReader(format, quality_encoding=force_quality_encoding)
     else:
@@ -43,14 +42,17 @@ def main():
     fastq_combiner = fastqCombiner(format)
     i = None
     skip_count = 0
-    for i, sequence in enumerate(fastaReader(open(fasta_filename, 'rt'))):
-        quality = qual_input.get(sequence)
-        if quality:
-            fastq_read = fastq_combiner.combine(sequence, quality)
-            out.write(fastq_read)
-        else:
-            skip_count += 1
-    out.close()
+
+    writer = fastqWriter(path=output_filename, format=format, force_quality_encoding=force_quality_encoding)
+    with writer:
+        for i, sequence in enumerate(fastaReader(open(fasta_filename, 'rt'))):
+            quality = qual_input.get(sequence)
+            if quality:
+                fastq_read = fastq_combiner.combine(sequence, quality)
+                writer.write(fastq_read)
+            else:
+                skip_count += 1
+
     if i is None:
         print("Your file contains no valid FASTA sequences.")
     else:
