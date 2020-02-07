@@ -8,7 +8,7 @@ shopt -s nullglob
 SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd )"
 
 # Planemo to install for test.
-PLANEMO_INSTALL_TARGET="${PLANEMO_INSTALL_TARGET:-planemo==0.38.0}"
+PLANEMO_INSTALL_TARGET="${PLANEMO_INSTALL_TARGET:-planemo}"
 
 # By default use pyton setup.py install to install the library.
 SETUP_COMMAND="${SETUP_COMMAND:-install}"
