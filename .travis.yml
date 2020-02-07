@@ -1,21 +1,17 @@
 language: python
-python: 2.7
-env:
-  - TOX_ENV=py27-lint
-  - TOX_ENV=py35-lint
-  - TOX_ENV=py27-lint-readme
-  - TOX_ENV=py27
-  - TOX_ENV=py35
-  - TOX_ENV=py27-lint-docstrings
-  - TOX_ENV=tool-tests
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
 
 install:
   # Setup git to allow git operations.
   - git config --global user.name "Travis Test User"
   - git config --global user.email "planemo_test@galaxyproject.org"
-  - pip install tox coveralls
+  - pip install tox-travis coveralls
 
-script: tox -e $TOX_ENV
+script: tox
 
 after_success:
   - coveralls
