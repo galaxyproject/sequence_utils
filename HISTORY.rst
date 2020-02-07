@@ -6,6 +6,19 @@ History
 .. to_doc
 
 ---------------------
+1.1.4 (2020-02-07)
+---------------------
+
+* Drop support for Python < 3.5
+  `Pull Request 24`_, `Pull Request 25`_
+* Prevent ``StopIteration`` from raising ``RuntimeError``
+  `Pull Request 20`_
+* Add ``fastqReader`` tests+test data; refactor; modify
+  `Pull Request 22`_
+* Fix inconsistent identifier option for ``fastq_groomer``
+  `Pull Request 23`_
+
+---------------------
 1.1.3 (2018-07-06)
 ---------------------
 
@@ -78,3 +91,8 @@ History
 .. _Pull Request 14: https://github.com/galaxyproject/sequence_utils/pull/14
 .. _Pull Request 15: https://github.com/galaxyproject/sequence_utils/pull/15
 .. _Pull Request 16: https://github.com/galaxyproject/sequence_utils/pull/16
+.. _Pull Request 20: https://github.com/galaxyproject/sequence_utils/pull/20
+.. _Pull Request 22: https://github.com/galaxyproject/sequence_utils/pull/22
+.. _Pull Request 23: https://github.com/galaxyproject/sequence_utils/pull/23
+.. _Pull Request 24: https://github.com/galaxyproject/sequence_utils/pull/24
+.. _Pull Request 25: https://github.com/galaxyproject/sequence_utils/pull/25
