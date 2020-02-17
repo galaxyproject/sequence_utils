@@ -547,9 +547,9 @@ class fastqAggregator(object):
 def _fastq_open_stream(fh=None, format="sanger", path=None, mode="r"):
     if fh is None:
         assert path is not None
-        if format.endswith(".gz"):
+        if format and format.endswith(".gz"):
             fh = gzip.open(path, mode="%st" % mode)
-        elif format.endswith(".bz2"):
+        elif format and format.endswith(".bz2"):
             if six.PY3:
                 fh = bz2.open(path, mode="%st" % mode)
             else:
@@ -557,9 +557,9 @@ def _fastq_open_stream(fh=None, format="sanger", path=None, mode="r"):
         else:
             fh = open(path, "%st" % mode)
     else:
-        if format.endswith(".gz"):
+        if format and format.endswith(".gz"):
             fh = gzip.GzipFile(fileobj=fh, mode=mode)
-        elif format.endswith(".bz2"):
+        elif format and format.endswith(".bz2"):
             raise Exception("bz2 formats do not support file handle inputs")
     return fh
 
