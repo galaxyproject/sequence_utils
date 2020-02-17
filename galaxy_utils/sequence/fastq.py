@@ -566,6 +566,12 @@ def _fastq_open_stream(fh=None, format="sanger", path=None, mode="r"):
 
 class fileHandler(object):
 
+    def __init__(self, fh, format, path):
+        self.fh = fh
+        self.format = format
+        self.path = path
+        self._file = None
+
     @property
     def file(self):
         if self._file is None:
@@ -602,12 +608,9 @@ class fastqReader(fileHandler, Iterator):
 
     def __init__(
             self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
-        self.fh = fh
-        self.format = format
+        super(fastqReader, self).__init__(fh=fh, format=format, path=path)
         self.apply_galaxy_conventions = apply_galaxy_conventions
-        self.path = path
         self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
-        self._file = None
 
     def __next__(self):
         rval = fastqSequencingRead.get_class_by_format(self.format)()
@@ -808,11 +811,8 @@ class fastqWriter(fileHandler):
     mode = 'w'
 
     def __init__(self, fh=None, format=None, force_quality_encoding=None, path=None):
-        self.fh = fh
-        self.format = format
+        super(fastqWriter, self).__init__(fh=fh, format=format, path=path)
         self.force_quality_encoding = force_quality_encoding
-        self.path = path
-        self._file = None
 
     def write(self, fastq_read):
         if self.format:
