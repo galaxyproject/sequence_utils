@@ -596,7 +596,7 @@ class fileHandler(object):
         return self.close()
 
 
-class fastqReader(Iterator, fileHandler):
+class fastqReader(fileHandler, Iterator):
 
     mode = 'r'
 
