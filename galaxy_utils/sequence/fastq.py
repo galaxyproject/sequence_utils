@@ -573,6 +573,17 @@ class fastqReader(Iterator):
         self.apply_galaxy_conventions = apply_galaxy_conventions
         self.path = path
         self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
+        self._file = None
+
+    @property
+    def file(self):
+        if self._file is None:
+            self._file = fastq_open_stream(fh=self.fh, format=self.format, path=self.path)
+        return self._file
+
+    @file.setter
+    def file(self, fh):
+        self._file = fh
 
     def __enter__(self):
         fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path)
