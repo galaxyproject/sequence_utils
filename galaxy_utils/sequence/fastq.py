@@ -544,43 +544,51 @@ class fastqAggregator(object):
         return column_stats
 
 
-def _fastq_open_stream(fh=None, format="sanger", path=None):
+def _fastq_open_stream(fh=None, format="sanger", path=None, mode="r"):
     if fh is None:
         assert path is not None
-        if format.endswith(".gz"):
-            fh = gzip.open(path, mode="rt")
-        elif format.endswith(".bz2"):
+        if format and format.endswith(".gz"):
+            fh = gzip.open(path, mode="%st" % mode)
+        elif format and format.endswith(".bz2"):
             if six.PY3:
-                fh = bz2.open(path, mode="rt")
+                fh = bz2.open(path, mode="%st" % mode)
             else:
-                fh = bz2.BZ2File(path, mode="r")
+                fh = bz2.BZ2File(path, mode=mode)
         else:
-            fh = open(path, "rt")
+            fh = open(path, "%st" % mode)
     else:
-        if format.endswith(".gz"):
-            fh = gzip.GzipFile(fileobj=fh, mode="r")
-        elif format.endswith(".bz2"):
+        if format and format.endswith(".gz"):
+            fh = gzip.GzipFile(fileobj=fh, mode=mode)
+        elif format and format.endswith(".bz2"):
             raise Exception("bz2 formats do not support file handle inputs")
     return fh
 
 
-class fastqReader(Iterator):
+class fileHandler(object):
 
-    def __init__(
-            self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
+    def __init__(self, fh, format, path):
         self.fh = fh
         self.format = format
-        self.apply_galaxy_conventions = apply_galaxy_conventions
         self.path = path
-        self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
+        self._file = None
+
+    @property
+    def file(self):
+        if self._file is None:
+            self._file = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path, mode=self.mode)
+        return self._file
+
+    @file.setter
+    def file(self, fh):
+        self._file = fh
 
     def __enter__(self):
-        fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path)
+        fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path, mode=self.mode)
         self._set_file_handle(fh)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.file.close()
+        self.close()
 
     def _set_file_handle(self, fh):
         # Extension point for subclasses to wrap file handler
@@ -592,6 +600,17 @@ class fastqReader(Iterator):
     def _close_on_error(self):
         # Extension point for subclasses (fastqVerboseErrorReader needs file access after error)
         return self.close()
+
+
+class fastqReader(fileHandler, Iterator):
+
+    mode = 'r'
+
+    def __init__(
+            self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
+        super(fastqReader, self).__init__(fh=fh, format=format, path=path)
+        self.apply_galaxy_conventions = apply_galaxy_conventions
+        self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
 
     def __next__(self):
         rval = fastqSequencingRead.get_class_by_format(self.format)()
@@ -787,44 +806,18 @@ class fastqNamedReader(fastqReader):
         return rval
 
 
-class fastqWriter(object):
+class fastqWriter(fileHandler):
+
+    mode = 'w'
 
     def __init__(self, fh=None, format=None, force_quality_encoding=None, path=None):
-        self.fh = fh
-        self.format = format
+        super(fastqWriter, self).__init__(fh=fh, format=format, path=path)
         self.force_quality_encoding = force_quality_encoding
-        self.path = path
-
-    def __enter__(self):
-        if self.fh is None:
-            if self.format and self.format.endswith(".gz"):
-                self.fh = gzip.open(self.path, "wt")
-            elif self.format and self.format.endswith(".bz2"):
-                if six.PY2:
-                    self.fh = bz2.BZ2File(self.path, mode="w")
-                else:
-                    self.fh = bz2.open(self.path, mode="wt")
-            else:
-                self.fh = open(self.path, "wt")
-        else:
-            if self.format and self.format.endswith(".gz"):
-                self.fh = gzip.GzipFile(fileobj=self.fh)
-            elif self.format and self.format.endswith(".bz2"):
-                raise Exception("bz2 formats do not support file handle inputs")
-
-        self.file = self.fh
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
 
     def write(self, fastq_read):
         if self.format:
             fastq_read = fastq_read.convert_read_to_format(self.format, force_quality_encoding=self.force_quality_encoding)
         self.file.write(str(fastq_read))
-
-    def close(self):
-        return self.file.close()
 
 
 class fastqJoiner(object):

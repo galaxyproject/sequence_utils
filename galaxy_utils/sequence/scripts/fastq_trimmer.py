@@ -22,7 +22,7 @@ def main():
     writer = fastqWriter(path=output_filename, format=input_type)
     reader = fastqReader(path=input_filename, format=input_type)
     with writer, reader:
-        for num_reads, fastq_read in enumerate(fastqReader(path=input_filename, format=input_type)):
+        for num_reads, fastq_read in enumerate(reader):
             if percent_offsets:
                 left_column_offset = int(round(float(left_offset) / 100.0 * float(len(fastq_read))))
                 right_column_offset = int(round(float(right_offset) / 100.0 * float(len(fastq_read))))
