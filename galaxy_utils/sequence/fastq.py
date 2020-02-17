@@ -577,7 +577,7 @@ class fileHandler(object):
         self._file = fh
 
     def __enter__(self):
-        fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path)
+        fh = _fastq_open_stream(fh=self.fh, format=self.format, path=self.path, mode=self.mode)
         self._set_file_handle(fh)
         return self
 
