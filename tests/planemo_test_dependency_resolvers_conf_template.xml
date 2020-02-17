@@ -1,3 +1,0 @@
-<dependency_resolvers>
-  <galaxy_packages versionless="true" base_path="_temp_dir_/dependencies" />
-</dependency_resolvers>

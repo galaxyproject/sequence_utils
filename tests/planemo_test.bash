@@ -24,26 +24,9 @@ PLANEMO_VIRTUAL_ENV="${PLANEMO_VIRTUAL_ENV:-$TEMP_DIR/planemo-venv}"
 virtualenv "$PLANEMO_VIRTUAL_ENV"
 . "$PLANEMO_VIRTUAL_ENV/bin/activate"
 pip install "$PLANEMO_INSTALL_TARGET"
-deactivate
-
-ENV_DIR="$TEMP_DIR/dependencies/galaxy_sequence_utils/dev"
-mkdir -p "$ENV_DIR"
-cat "$SCRIPT_DIR/planemo_test_env.sh" | sed -e "s#_temp_dir_#/$TEMP_DIR#" > "$ENV_DIR/env.sh"
-ln -s dev "$TEMP_DIR/dependencies/galaxy_sequence_utils/default"
-
-virtualenv "$ENV_DIR/venv"
-. "$ENV_DIR/venv/bin/activate"
 
 cd $SCRIPT_DIR/..
 python setup.py "$SETUP_COMMAND"
-
-## TODO: Add option to test a wheel instead.
-# pip install $SCRIPT_DIR/../dist/*whl
-
-cat "$SCRIPT_DIR/planemo_test_dependency_resolvers_conf_template.xml" | sed -e "s#_temp_dir_#$TEMP_DIR#" > "$TEMP_DIR/dependency_resolvers_conf.xml"
-
-
-. "$PLANEMO_VIRTUAL_ENV/bin/activate"
 
 if [ -z "$1" ];
 then
@@ -59,5 +42,5 @@ fi
 
 for tool_dir in $TARGET_TOOL_DIRS
 do
-    planemo test --no_cleanup --dependency_resolvers_config_file "$TEMP_DIR/dependency_resolvers_conf.xml" "$TOOLS_DEVTEAM/$tool_dir"
+    planemo test --no_conda_auto_init --no_cleanup --no_dependency_resolution "$TOOLS_DEVTEAM/$tool_dir"
 done
