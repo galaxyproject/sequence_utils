@@ -40,7 +40,7 @@ else
     TARGET_TOOL_DIRS=("$1")
 fi
 
-for tool_dir in $TARGET_TOOL_DIRS
+for tool_dir in ${TARGET_TOOL_DIRS[@]}
 do
     planemo test --no_conda_auto_init --no_cleanup --no_dependency_resolution "$TOOLS_DEVTEAM/$tool_dir"
 done
