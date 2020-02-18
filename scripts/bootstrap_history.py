@@ -7,7 +7,7 @@ try:
     import requests
 except ImportError:
     requests = None
-import urlparse
+import urllib.parse
 import textwrap
 
 PROJECT_DIRECTORY = os.path.join(os.path.dirname(__file__), "..")
@@ -37,19 +37,19 @@ def main(argv):
     if len(argv) > 2:
         message = argv[2]
     elif not (ident.startswith("pr") or ident.startswith("issue")):
-        api_url = urlparse.urljoin(PROJECT_API, "commits/%s" % ident)
+        api_url = urllib.parse.urljoin(PROJECT_API, "commits/%s" % ident)
         req = requests.get(api_url).json()
         commit = req["commit"]
         message = commit["message"]
         message = get_first_sentence(message)
     elif requests is not None and ident.startswith("pr"):
         pull_request = ident[len("pr"):]
-        api_url = urlparse.urljoin(PROJECT_API, "pulls/%s" % pull_request)
+        api_url = urllib.parse.urljoin(PROJECT_API, "pulls/%s" % pull_request)
         req = requests.get(api_url).json()
         message = req["title"]
     elif requests is not None and ident.startswith("issue"):
         issue = ident[len("issue"):]
-        api_url = urlparse.urljoin(PROJECT_API, "issues/%s" % issue)
+        api_url = urllib.parse.urljoin(PROJECT_API, "issues/%s" % issue)
         req = requests.get(api_url).json()
         message = req["title"]
     else:
