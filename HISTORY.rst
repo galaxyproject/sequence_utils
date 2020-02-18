@@ -6,6 +6,12 @@ History
 .. to_doc
 
 ---------------------
+1.1.5 (2020-02-18)
+---------------------
+
+* Fix fastqreader file handling and CI tests `Pull Request 27`_
+
+---------------------
 1.1.4 (2020-02-07)
 ---------------------
 
@@ -80,6 +86,7 @@ History
   `Pull Request 1`_
 
 .. github_links
+.. _Pull Request 27: https://github.com/galaxyproject/sequence_utils/pull/27
 .. _a9b907c: https://github.com/galaxyproject/sequence_utils/commit/a9b907c
 .. _c68932a: https://github.com/galaxyproject/sequence_utils/commit/c68932a
 .. _5e9bfc0: https://github.com/galaxyproject/sequence_utils/commit/5e9bfc0

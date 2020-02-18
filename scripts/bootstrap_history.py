@@ -25,7 +25,7 @@ PROJECT_API = PROJECT_URL.replace("https://github.com/", "https://api.github.com
 
 def main(argv):
     history_path = os.path.join(PROJECT_DIRECTORY, "HISTORY.rst")
-    history = open(history_path, "r").read().decode("utf-8")
+    history = open(history_path, "r").read()
 
     def extend(from_str, line):
         from_str += "\n"
@@ -75,7 +75,8 @@ def main(argv):
 
     to_doc = wrap(to_doc)
     history = extend(".. to_doc", to_doc)
-    open(history_path, "w").write(history.encode("utf-8"))
+    with open(history_path, "w") as fh:
+        fh.write(history)
 
 
 def get_first_sentence(message):
