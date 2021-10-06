@@ -86,8 +86,8 @@ class FastqJoiner(fq.fastqJoiner):
         if rval.sequence_space == 'color':
             # convert to nuc space, join, then convert back
             rval.sequence = rval.convert_base_to_color_space(
-                read1.convert_color_to_base_space(read1.sequence) + self.paste_sequence +
-                read2.convert_color_to_base_space(read2.sequence)
+                read1.convert_color_to_base_space(read1.sequence) + self.paste_sequence
+                + read2.convert_color_to_base_space(read2.sequence)
             )
         else:
             rval.sequence = read1.sequence + self.paste_sequence + read2.sequence

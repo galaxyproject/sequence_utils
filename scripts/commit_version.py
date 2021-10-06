@@ -22,7 +22,7 @@ def main(argv):
 
     source_mod_path = os.path.join(PROJECT_DIRECTORY, source_dir, "__init__.py")
     mod = open(source_mod_path, "r").read()
-    mod = re.sub("__version__ = '[\d\.]*\.dev0'",
+    mod = re.sub(r"__version__ = '[\d\.]*\.dev0'",
                  "__version__ = '%s'" % version,
                  mod)
     mod = open(source_mod_path, "w").write(mod)

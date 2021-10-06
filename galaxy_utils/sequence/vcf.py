@@ -45,7 +45,7 @@ class VariantCall33(VariantCall):
         self.alt = self.alt.split(',')
         try:
             self.qual = float(self.qual)
-        except:
+        except ValueError:
             self.qual = NOT_A_NUMBER  # Missing data can be denoted as a '.'
         if len(self.fields) > self.required_header_length:
             self.format = self.fields[self.required_header_length].split(':')
@@ -88,7 +88,7 @@ class Reader(object):
             if self.vcf_class and line.startswith(self.vcf_class.header_startswith):
                 # read the header fields, ignoring any blank tabs, which GATK
                 # VCF produces after the sample
-                self.header_fields = [l for l in line.split('\t') if l]
+                self.header_fields = [field for field in line.split('\t') if field]
                 if len(self.header_fields) > self.vcf_class.required_header_length:
                     for sample_name in self.header_fields[self.vcf_class.required_header_length + 1:]:
                         self.sample_names.append(sample_name)
@@ -127,4 +127,3 @@ class Reader(object):
                 self.close()
                 # Catch exception and return normally
                 return
-

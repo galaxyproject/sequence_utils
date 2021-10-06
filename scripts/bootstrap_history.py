@@ -3,12 +3,13 @@
 # pull message down and embed, use arg parse, handle multiple, etc...
 import os
 import sys
+import textwrap
+import urllib.parse
+
 try:
     import requests
 except ImportError:
     requests = None
-import urllib.parse
-import textwrap
 
 PROJECT_DIRECTORY = os.path.join(os.path.dirname(__file__), "..")
 new_path = [PROJECT_DIRECTORY]
