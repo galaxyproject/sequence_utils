@@ -1,6 +1,5 @@
 # Dan Blankenberg
 
-from __future__ import print_function
 
 import sys
 
@@ -40,9 +39,9 @@ def main():
         out.write('%s\t' % ','.join(map(str, column_stats['outliers'])))
         base_counts = aggregator.get_base_counts_for_column(i)
         for nuc in valid_nucleotides:
-            out.write("%s\t" % base_counts.get(nuc, 0))
+            out.write(f"{base_counts.get(nuc, 0)}\t")
         extra_nucs = sorted(nuc for nuc in base_counts.keys() if nuc not in valid_nucleotides)
-        out.write("%s\t%s\n" % (','.join(extra_nucs), ','.join(str(base_counts[nuc]) for nuc in extra_nucs)))
+        out.write("{}\t{}\n".format(','.join(extra_nucs), ','.join(str(base_counts[nuc]) for nuc in extra_nucs)))
     out.close()
     if num_reads is None:
         print("No valid fastq reads could be processed.")

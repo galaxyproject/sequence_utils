@@ -1,27 +1,15 @@
 # Dan Blankenberg
 # Contains methods to tranform sequence strings
-import string
-
-import six
-
 DNA_COMPLEMENT_FROM = "ACGTRYKMBDHVacgtrykmbdhv"
 DNA_COMPLEMENT_TO = "TGCAYRMKVHDBtgcayrmkvhdb"
 
 RNA_COMPLEMENT_FROM = "ACGURYKMBDHVacgurykmbdhv"
 RNA_COMPLEMENT_TO = "UGCAYRMKVHDBugcayrmkvhdb"
 
-if six.PY2:
-    # Translation table for reverse Complement, with ambiguity codes
-    DNA_COMPLEMENT = string.maketrans(DNA_COMPLEMENT_FROM, DNA_COMPLEMENT_TO)
-    RNA_COMPLEMENT = string.maketrans(RNA_COMPLEMENT_FROM, RNA_COMPLEMENT_TO)
-    # Translation table for DNA <--> RNA
-    DNA_TO_RNA = string.maketrans("Tt", "Uu")
-    RNA_TO_DNA = string.maketrans("Uu", "Tt")
-else:
-    DNA_COMPLEMENT = str.maketrans(DNA_COMPLEMENT_FROM, DNA_COMPLEMENT_TO)
-    RNA_COMPLEMENT = str.maketrans(RNA_COMPLEMENT_FROM, RNA_COMPLEMENT_TO)
-    DNA_TO_RNA = str.maketrans("Tt", "Uu")
-    RNA_TO_DNA = str.maketrans("Uu", "Tt")
+DNA_COMPLEMENT = str.maketrans(DNA_COMPLEMENT_FROM, DNA_COMPLEMENT_TO)
+RNA_COMPLEMENT = str.maketrans(RNA_COMPLEMENT_FROM, RNA_COMPLEMENT_TO)
+DNA_TO_RNA = str.maketrans("Tt", "Uu")
+RNA_TO_DNA = str.maketrans("Uu", "Tt")
 
 
 # reverse sequence string
@@ -58,7 +46,7 @@ def to_RNA(sequence):
     return sequence.translate(RNA_TO_DNA)
 
 
-class ColorSpaceConverter(object):
+class ColorSpaceConverter:
     unknown_base = 'N'
     unknown_color = '.'
     color_to_base_dict = {}
@@ -68,15 +56,15 @@ class ColorSpaceConverter(object):
     color_to_base_dict['T'] = {'0': 'T', '1': 'G', '2': 'C', '3': 'A', '4': 'N', '5': 'N', '6': 'N', '.': 'N'}
     color_to_base_dict['N'] = {'0': 'N', '1': 'N', '2': 'N', '3': 'N', '4': 'N', '5': 'N', '6': 'N', '.': 'N'}
     base_to_color_dict = {}
-    for base, color_dict in six.iteritems(color_to_base_dict):
+    for base, color_dict in color_to_base_dict.items():
         base_to_color_dict[base] = {}
-        for key, value in six.iteritems(color_dict):
+        for key, value in color_dict.items():
             base_to_color_dict[base][value] = key
         base_to_color_dict[base]['N'] = '4'  # force ACGT followed by N to be '4', because this is now 'processed' data; we could force to '.' (non-processed data) also
     base_to_color_dict['N'].update({'A': '5', 'C': '5', 'G': '5', 'T': '5', 'N': '6'})
 
     def __init__(self, fake_adapter_base='G'):
-        assert fake_adapter_base in self.base_to_color_dict, 'A bad fake adapter base was provided: %s.' % fake_adapter_base
+        assert fake_adapter_base in self.base_to_color_dict, f'A bad fake adapter base was provided: {fake_adapter_base}.'
         self.fake_adapter_base = fake_adapter_base
 
     def to_color_space(self, sequence, adapter_base=None):
@@ -96,7 +84,7 @@ class ColorSpaceConverter(object):
             last_base = sequence.pop(0)
         else:
             last_base = None
-        assert last_base in self.color_to_base_dict, 'A valid adapter base must be included when converting to base space from color space. Found: %s' % last_base
+        assert last_base in self.color_to_base_dict, f'A valid adapter base must be included when converting to base space from color space. Found: {last_base}'
         rval = ''
         for color_val in sequence:
             last_base = self.color_to_base_dict[last_base].get(color_val, self.unknown_base)

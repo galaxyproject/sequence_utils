@@ -137,7 +137,7 @@ def test_fastq_reader_cleanup():
 
 def test_vcf_reader_cleanup():
     i_path = _data_path("vcf_reader_1.vcf")
-    fh = open(i_path, "rt")
+    fh = open(i_path)
     with _new_argv([fh]):
         reader = vcfReader(fh)
         for _ in reader:
@@ -260,7 +260,7 @@ def _assert_paths_equal(actual, expected):
     with open(expected, "rb") as f:
         expected_contents = f.read()
 
-    assert actual_contents == expected_contents, "%s != %s" % (actual_contents, expected_contents)
+    assert actual_contents == expected_contents, f"{actual_contents} != {expected_contents}"
 
 
 def _data_path(filename):
@@ -285,7 +285,7 @@ def _new_argv(argv):
         sys.argv = o_argv
 
 
-class _TempDirectoryContext(object):
+class _TempDirectoryContext:
 
     def __init__(self):
         self.temp_directory = mkdtemp()

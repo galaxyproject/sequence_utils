@@ -1,6 +1,5 @@
 # Dan Blankenberg
 
-from __future__ import print_function
 
 from optparse import OptionParser
 
@@ -133,7 +132,7 @@ def main():
     else:
         print("%i FASTQ reads were processed." % (num_reads + 1))
     if num_reads_excluded:
-        print("%i reads of zero length were excluded from the output." % num_reads_excluded)
+        print("%i reads of zero length were excluded from the output." % (num_reads_excluded, ))
 
 
 if __name__ == "__main__":

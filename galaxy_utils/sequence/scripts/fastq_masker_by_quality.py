@@ -1,5 +1,4 @@
 # Dan Blankenberg
-from __future__ import print_function
 
 from optparse import OptionParser
 
@@ -19,7 +18,7 @@ def get_score_comparer(operator):
         return compare_le
     elif operator == 'ne':
         return compare_ne
-    raise 'Invalid operator provided: %s' % operator
+    raise f'Invalid operator provided: {operator}'
 
 
 def compare_gt(quality_score, threshold_value):
@@ -46,7 +45,7 @@ def compare_le(quality_score, threshold_value):
     return quality_score <= threshold_value
 
 
-class BaseReplacer(object):
+class BaseReplacer:
 
     def __init__(self, replace_character):
         self.replace_character = replace_character

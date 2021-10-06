@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import ast
-import os
 import re
 try:
     from setuptools import setup
@@ -11,11 +9,11 @@ except ImportError:
 
 SOURCE_DIR = "galaxy_utils"
 
-with open('%s/__init__.py' % SOURCE_DIR, 'rb') as f:
+with open(f'{SOURCE_DIR}/__init__.py', 'rb') as f:
     init_contents = f.read().decode('utf-8')
 
     def get_var(var_name):
-        pattern = re.compile(r'%s\s+=\s+(.*)' % var_name)
+        pattern = re.compile(fr'{var_name}\s+=\s+(.*)')
         match = pattern.search(init_contents).group(1)
         return str(ast.literal_eval(match))
 
@@ -57,14 +55,6 @@ PACKAGE_DIR = {
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
-if os.path.exists("requirements.txt"):
-    requirements = open("requirements.txt").read().split("\n")
-else:
-    # In tox, it will cover them anyway.
-    requirements = []
-test_requirements = []
-
-
 setup(
     name=PROJECT_NAME,
     version=version,
@@ -78,7 +68,6 @@ setup(
     package_data=PACKAGE_DATA,
     package_dir=PACKAGE_DIR,
     include_package_data=True,
-    install_requires=requirements,
     license="AFL",
     zip_safe=False,
     keywords='planemo',
@@ -90,11 +79,11 @@ setup(
         'Operating System :: POSIX',
         'Topic :: Software Development',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     test_suite=TEST_DIR,
-    tests_require=test_requirements
 )

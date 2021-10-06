@@ -1,5 +1,3 @@
-# Default tests run with make test and make quick-tests
-NOSE_TESTS?=tests galaxy_utils
 # Default environment for make tox
 ENV?=py27
 # Extra arguments supplied to tox command
@@ -51,7 +49,7 @@ install: ## install into Python environment
 
 setup-venv: ## setup a development virtualenv in current directory
 	if [ ! -d $(VENV) ]; then virtualenv $(VENV); exit; fi;
-	$(IN_VENV) pip install -r requirements.txt && pip install -r dev-requirements.txt
+	$(IN_VENV) pip install -r dev-requirements.txt
 
 setup-git-hook-lint: ## setup precommit hook for linting project
 	cp $(BUILD_SCRIPTS_DIR)/pre-commit-lint .git/hooks/pre-commit
@@ -69,7 +67,7 @@ lint-readme: ## check README formatting for PyPI
 	$(IN_VENV) python setup.py check -r -s
 
 test: ## run tests with the default Python (faster than tox)
-	$(IN_VENV) nosetests $(NOSE_TESTS)
+	$(IN_VENV) pytest
 
 tool-tests: ## Run tools-devteam tool tests against library in current state
 	bash tests/planemo_test.bash

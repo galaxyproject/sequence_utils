@@ -1,21 +1,15 @@
 # Dan Blankenberg
-
-from __future__ import print_function
-
 import os
 import shutil
 import sys
 
-import six
-
 from galaxy_utils.sequence.fastq import fastqReader, fastqWriter
 
-if six.PY3:
 
-    def execfile(path, vars):
-        with open(path) as f:
-            code = compile(f.read(), path, 'exec')
-            exec(code, vars)
+def execfile(path, vars):
+    with open(path) as f:
+        code = compile(f.read(), path, 'exec')
+        exec(code, vars)
 
 
 def main():
@@ -48,7 +42,7 @@ def main():
     if i is None:
         print("Your file contains no valid fastq reads.")
     else:
-        print('Kept %s of %s reads (%.2f%%).' % (reads_kept, i + 1, float(reads_kept) / float(i + 1) * 100.0))
+        print(f'Kept {reads_kept} of {i + 1} reads ({float(reads_kept) / float(i + 1) * 100.0:.2f}%).')
 
 
 if __name__ == "__main__":

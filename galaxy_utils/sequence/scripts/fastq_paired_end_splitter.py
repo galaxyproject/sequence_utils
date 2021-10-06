@@ -1,5 +1,4 @@
 # Dan Blankenberg
-from __future__ import print_function
 
 import sys
 
@@ -36,7 +35,7 @@ def main():
     if i is None:
         print("Your file contains no valid FASTQ reads.")
     else:
-        print('Split %s of %s reads (%.2f%%).' % (i - skip_count + 1, i + 1, float(i - skip_count + 1) / float(i + 1) * 100.0))
+        print(f'Split {i - skip_count + 1} of {i + 1} reads ({float(i - skip_count + 1) / float(i + 1) * 100.0:.2f}%).')
 
 
 if __name__ == "__main__":

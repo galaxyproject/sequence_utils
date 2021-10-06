@@ -1,22 +1,15 @@
 # Dan Blankenberg
-from __future__ import print_function
 
 import bz2
 import gzip
 import math
 import string
 
-import six
-from six import Iterator, string_types
-
 from . import transform
 from .fasta import fastaSequence
 from .sequence import SequencingRead
 
-if six.PY2:
-    LETTERS = string.letters
-else:
-    LETTERS = string.ascii_letters
+LETTERS = string.ascii_letters
 
 
 class fastqSequencingRead(SequencingRead):
@@ -30,7 +23,7 @@ class fastqSequencingRead(SequencingRead):
 
     @classmethod
     def get_class_by_format(cls, format):
-        assert format in FASTQ_FORMATS, 'Unknown format type specified: %s' % format
+        assert format in FASTQ_FORMATS, f'Unknown format type specified: {format}'
         return FASTQ_FORMATS[format]
 
     @classmethod
@@ -109,7 +102,7 @@ class fastqSequencingRead(SequencingRead):
                     to_quality = self.ascii_min - self.quality_min
                     return [chr(int(val) + to_quality) for val in quality.split()]
                 except ValueError as e:
-                    raise ValueError('Error Parsing quality String. ASCII quality strings cannot contain spaces (%s): %s' % (self.quality, e))
+                    raise ValueError(f'Error Parsing quality String. ASCII quality strings cannot contain spaces ({self.quality}): {e}')
             else:
                 return []
 
@@ -126,7 +119,7 @@ class fastqSequencingRead(SequencingRead):
                 try:
                     return len(quality.split())
                 except ValueError as e:
-                    raise ValueError('Error Parsing quality String. ASCII quality strings cannot contain spaces (%s): %s' % (self.quality, e))
+                    raise ValueError(f'Error Parsing quality String. ASCII quality strings cannot contain spaces ({self.quality}): {e}')
             else:
                 return 0
 
@@ -145,8 +138,8 @@ class fastqSequencingRead(SequencingRead):
                 return []
 
     def convert_read_to_format(self, format, force_quality_encoding=None):
-        assert format in FASTQ_FORMATS, 'Unknown format type specified: %s' % format
-        assert force_quality_encoding in [None, 'ascii', 'decimal'], 'Invalid force_quality_encoding: %s' % force_quality_encoding
+        assert format in FASTQ_FORMATS, f'Unknown format type specified: {format}'
+        assert force_quality_encoding in [None, 'ascii', 'decimal'], f'Invalid force_quality_encoding: {force_quality_encoding}'
         new_class = FASTQ_FORMATS[format]
         new_read = new_class()
         new_read.identifier = self.identifier
@@ -346,7 +339,7 @@ class fastqCSSangerRead(fastqSequencingRead):
                 adapter = transform.DNA_complement(adapter)
             else:
                 adapter = transform.RNA_complement(adapter)
-            rval.sequence = "%s%s" % (adapter, sequence)
+            rval.sequence = f"{adapter}{sequence}"
         return rval
 
     def change_adapter(self, new_adapter, clone=True):
@@ -362,7 +355,7 @@ class fastqCSSangerRead(fastqSequencingRead):
             else:
                 rval.sequence = rval.sequence[1:]
         elif new_adapter:
-            rval.sequence = "%s%s" % (new_adapter, rval.sequence)
+            rval.sequence = f"{new_adapter}{rval.sequence}"
         return rval
 
     def apply_galaxy_conventions(self):
@@ -380,7 +373,7 @@ for format in [fastqIlluminaRead, fastqSolexaRead, fastqSangerRead, fastqCSSange
     FASTQ_FORMATS[format.format + ".bz2"] = format
 
 
-class fastqAggregator(object):
+class fastqAggregator:
     VALID_FORMATS = list(FASTQ_FORMATS.keys())
 
     def __init__(self):
@@ -548,14 +541,11 @@ def _fastq_open_stream(fh=None, format="sanger", path=None, mode="r"):
     if fh is None:
         assert path is not None
         if format and format.endswith(".gz"):
-            fh = gzip.open(path, mode="%st" % mode)
+            fh = gzip.open(path, mode=f"{mode}t")
         elif format and format.endswith(".bz2"):
-            if six.PY3:
-                fh = bz2.open(path, mode="%st" % mode)
-            else:
-                fh = bz2.BZ2File(path, mode=mode)
+            fh = bz2.open(path, mode=f"{mode}t")
         else:
-            fh = open(path, "%st" % mode)
+            fh = open(path, f"{mode}t")
     else:
         if format and format.endswith(".gz"):
             fh = gzip.GzipFile(fileobj=fh, mode=mode)
@@ -564,7 +554,7 @@ def _fastq_open_stream(fh=None, format="sanger", path=None, mode="r"):
     return fh
 
 
-class fileHandler(object):
+class fileHandler:
 
     def __init__(self, fh, format, path):
         self.fh = fh
@@ -602,13 +592,13 @@ class fileHandler(object):
         return self.close()
 
 
-class fastqReader(fileHandler, Iterator):
+class fastqReader(fileHandler):
 
     mode = 'r'
 
     def __init__(
             self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
-        super(fastqReader, self).__init__(fh=fh, format=format, path=path)
+        super().__init__(fh=fh, format=format, path=path)
         self.apply_galaxy_conventions = apply_galaxy_conventions
         self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
 
@@ -638,7 +628,7 @@ class fastqReader(fileHandler, Iterator):
 
         if not line.startswith('@'):
             self.close()
-            raise fastqFormatError('Invalid FASTQ header: %s' % line)
+            raise fastqFormatError(f'Invalid FASTQ header: {line}')
 
         return line
 
@@ -649,7 +639,7 @@ class fastqReader(fileHandler, Iterator):
                 self.close()
                 raise fastqFormatError(
                     'Invalid FASTQ file: could not find quality score of \
-                    sequence identifier %s.' % rval.identifier)
+                    sequence identifier {}.'.format(rval.identifier))
             line = line.rstrip('\n\r')
 
             if not line.startswith('+'):
@@ -687,7 +677,7 @@ class fastqReader(fileHandler, Iterator):
                 return
 
 
-class ReadlineCountFile(object):
+class ReadlineCountFile:
     def __init__(self, f):
         self.__file = f
         self.readline_count = 0
@@ -704,7 +694,7 @@ class fastqVerboseErrorReader(fastqReader):
     MAX_PRINT_ERROR_BYTES = 1024
 
     def __init__(self, fh=None, **kwds):
-        super(fastqVerboseErrorReader, self).__init__(fh=fh, **kwds)
+        super().__init__(fh=fh, **kwds)
         self.last_good_identifier = None
 
     def _close_on_error(self):
@@ -716,20 +706,20 @@ class fastqVerboseErrorReader(fastqReader):
 
     def __next__(self):
         if not hasattr(self.file, "readline_count"):
-            return super(fastqVerboseErrorReader, self).__next__()
+            return super().__next__()
 
         last_good_end_offset = self.file.tell()
         last_readline_count = self.file.readline_count
         try:
-            block = super(fastqVerboseErrorReader, self).__next__()
+            block = super().__next__()
             self.last_good_identifier = block.identifier
             return block
         except StopIteration as e:
             raise e
         except Exception as e:
-            print("There was an error reading your input file. Your input file is likely malformed.\nIt is suggested that you double-check your original input file for errors -- helpful information for this purpose has been provided below.\nHowever, if you think that you have encountered an actual error with this tool, please do tell us by using the bug reporting mechanism.\n\nThe reported error is: '%s'." % e)
+            print(f"There was an error reading your input file. Your input file is likely malformed.\nIt is suggested that you double-check your original input file for errors -- helpful information for this purpose has been provided below.\nHowever, if you think that you have encountered an actual error with this tool, please do tell us by using the bug reporting mechanism.\n\nThe reported error is: '{e}'.")
             if self.last_good_identifier is not None:
-                print("The last valid FASTQ read had an identifier of '%s'." % self.last_good_identifier)
+                print(f"The last valid FASTQ read had an identifier of '{self.last_good_identifier}'.")
             else:
                 print("The error occurred at the start of your file and no valid FASTQ reads were found.")
             error_offset = self.file.tell()
@@ -744,13 +734,13 @@ class fastqVerboseErrorReader(fastqReader):
 
 class fastqNamedReader(fastqReader):
     def __init__(self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None):
-        super(fastqNamedReader, self).__init__(fh=fh, format=format, apply_galaxy_conventions=apply_galaxy_conventions, path=path)
+        super().__init__(fh=fh, format=format, apply_galaxy_conventions=apply_galaxy_conventions, path=path)
         self.offset_dict = {}
         self.eof = False
 
     def get(self, sequence_identifier):
         # Input is either a sequence ID or a sequence object
-        if not isinstance(sequence_identifier, string_types):
+        if not isinstance(sequence_identifier, str):
             # Input was a sequence object (not a sequence ID). Get the sequence ID
             sequence_identifier = sequence_identifier.identifier
         # Get only the ID part of the sequence header
@@ -800,9 +790,9 @@ class fastqNamedReader(fastqReader):
                 eof = True
             self.file.seek(offset)
         if count:
-            rval = "There were %i known sequence reads not utilized. " % count
+            rval = "There were %i known sequence reads not utilized. " % (count, )
         if not eof:
-            rval = "%s%s" % (rval, "An additional unknown number of reads exist in the input that were not utilized.")
+            rval = "{}{}".format(rval, "An additional unknown number of reads exist in the input that were not utilized.")
         return rval
 
 
@@ -811,7 +801,7 @@ class fastqWriter(fileHandler):
     mode = 'w'
 
     def __init__(self, fh=None, format=None, force_quality_encoding=None, path=None):
-        super(fastqWriter, self).__init__(fh=fh, format=format, path=path)
+        super().__init__(fh=fh, format=format, path=path)
         self.force_quality_encoding = force_quality_encoding
 
     def write(self, fastq_read):
@@ -820,7 +810,7 @@ class fastqWriter(fileHandler):
         self.file.write(str(fastq_read))
 
 
-class fastqJoiner(object):
+class fastqJoiner:
 
     def __init__(self, format, force_quality_encoding=None, paste=""):
         self.format = format
@@ -871,22 +861,22 @@ class fastqJoiner(object):
         if force_quality_encoding == 'ascii':
             rval.quality = new_read1.quality + self.paste_ascii_quality + new_read2.quality
         else:
-            rval.quality = "%s %s" % (new_read1.quality.strip(), self.paste_decimal_quality)
-            rval.quality = ("%s %s" % (rval.quality.strip(), new_read2.quality.strip())).strip()
+            rval.quality = f"{new_read1.quality.strip()} {self.paste_decimal_quality}"
+            rval.quality = (f"{rval.quality.strip()} {new_read2.quality.strip()}").strip()
         return rval
 
     def get_paired_identifier(self, fastq_read):
         read_id, read_sep, read_desc = fastq_read.identifier.partition(' ')
         if read_id[-2] == '/':
             if read_id[-1] == "1":
-                read_id = "%s2" % read_id[:-1]
+                read_id = f"{read_id[:-1]}2"
             elif read_id[-1] == "2":
-                read_id = "%s1" % read_id[:-1]
+                read_id = f"{read_id[:-1]}1"
         return read_id
 
     def is_first_mate(self, sequence_id):
         is_first = None
-        if not isinstance(sequence_id, string_types):
+        if not isinstance(sequence_id, str):
             sequence_id = sequence_id.identifier
         sequence_id, sequence_sep, sequence_desc = sequence_id.partition(' ')
         if sequence_id[-2] == '/':
@@ -897,7 +887,7 @@ class fastqJoiner(object):
         return is_first
 
 
-class fastqSplitter(object):
+class fastqSplitter:
     def split(self, fastq_read):
         length = len(fastq_read)
         # Only reads of even lengths can be split
@@ -915,20 +905,20 @@ class fastqSplitter(object):
         return read1, read2
 
 
-class fastqCombiner(object):
+class fastqCombiner:
     def __init__(self, format):
         self.format = format
 
     def combine(self, fasta_seq, quality_seq):
         fastq_read = fastqSequencingRead.get_class_by_format(self.format)()
-        fastq_read.identifier = "@%s" % fasta_seq.identifier[1:]
+        fastq_read.identifier = f"@{fasta_seq.identifier[1:]}"
         fastq_read.description = '+'
         fastq_read.sequence = fasta_seq.sequence
         fastq_read.quality = quality_seq.sequence
         return fastq_read
 
 
-class fastqFakeFastaScoreReader(object):
+class fastqFakeFastaScoreReader:
     def __init__(self, format='sanger', quality_encoding=None):
         self.fastq_read = fastqSequencingRead.get_class_by_format(format)()
         if quality_encoding != 'decimal':
@@ -947,7 +937,7 @@ class fastqFakeFastaScoreReader(object):
         if self.quality_encoding == 'ascii':
             new_sequence.sequence = chr(self.fastq_read.ascii_max) * len(self.fastq_read.get_sequence())
         else:
-            new_sequence.sequence = ("%i " % self.fastq_read.quality_max) * len(self.fastq_read.get_sequence())
+            new_sequence.sequence = ("%i " % (self.fastq_read.quality_max, )) * len(self.fastq_read.get_sequence())
         return new_sequence
 
     def has_data(self):

@@ -2,17 +2,12 @@
 import string
 from copy import deepcopy
 
-import six
-
 from . import transform
 
-if six.PY2:
-    LETTERS = string.letters
-else:
-    LETTERS = string.ascii_letters
+LETTERS = string.ascii_letters
 
 
-class SequencingRead(object):
+class SequencingRead:
     color_space_converter = transform.ColorSpaceConverter()
     valid_sequence_list = LETTERS
 
@@ -26,7 +21,7 @@ class SequencingRead(object):
         return len(self.sequence)
 
     def __str__(self):
-        return "%s\n%s\n%s\n%s\n" % (self.identifier, self.sequence, self.description, self.quality)
+        return f"{self.identifier}\n{self.sequence}\n{self.description}\n{self.quality}\n"
 
     def append_sequence(self, sequence):
         self.sequence += sequence.rstrip('\n\r')

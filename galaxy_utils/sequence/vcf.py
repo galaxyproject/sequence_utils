@@ -4,7 +4,7 @@
 NOT_A_NUMBER = float('NaN')
 
 
-class VariantCall(object):
+class VariantCall:
     version = None
     header_startswith = None
     required_header_fields = None
@@ -12,7 +12,7 @@ class VariantCall(object):
 
     @classmethod
     def get_class_by_format(cls, format):
-        assert format in VCF_FORMATS, 'Unknown format type specified: %s' % format
+        assert format in VCF_FORMATS, f'Unknown format type specified: {format}'
         return VCF_FORMATS[format]
 
     def __init__(self, vcf_line, metadata, sample_names):
@@ -70,7 +70,7 @@ for format in [VariantCall33, VariantCall40, VariantCall41]:
     VCF_FORMATS[format.version] = format
 
 
-class Reader(object):
+class Reader:
     def __init__(self, fh):
         self.vcf_file = fh
         self.metadata = {}

@@ -2,7 +2,6 @@
 Extended version of Dan Blankenberg's fastq joiner ( adds support for
 recent Illumina headers ).
 """
-from __future__ import print_function
 
 import re
 import sys
@@ -10,7 +9,7 @@ import sys
 import galaxy_utils.sequence.fastq as fq
 
 
-class IDManager(object):
+class IDManager:
 
     def __init__(self, sep="\t"):
         """
@@ -29,18 +28,18 @@ class IDManager(object):
         try:
             coords, flags = identifier.strip()[1:].split(self.sep, 1)
         except ValueError:
-            raise RuntimeError("bad identifier: %r" % (identifier, ))
+            raise RuntimeError(f"bad identifier: {identifier!r}")
         return coords.split(":"), flags.split(":")
 
     def join_id(self, parsed_id):
         coords, flags = parsed_id
-        return "@%s%s%s" % (":".join(coords), self.sep, ":".join(flags))
+        return "@{}{}{}".format(":".join(coords), self.sep, ":".join(flags))
 
     def get_read_number(self, parsed_id):
         return int(parsed_id[1][0])
 
     def set_read_number(self, parsed_id, n):
-        parsed_id[1][0] = "%d" % n
+        parsed_id[1][0] = "%d" % (n, )
 
     def get_paired_identifier(self, read):
         t = self.parse_id(read.identifier)
@@ -50,7 +49,7 @@ class IDManager(object):
         elif n == 2:
             pn = 1
         else:
-            raise RuntimeError("Unknown read number '%d'" % n)
+            raise RuntimeError("Unknown read number '%d'" % (n, ))
         self.set_read_number(t, pn)
         return self.join_id(t)
 
@@ -58,7 +57,7 @@ class IDManager(object):
 class FastqJoiner(fq.fastqJoiner):
 
     def __init__(self, format, force_quality_encoding=None, sep="\t", paste=""):
-        super(FastqJoiner, self).__init__(format, force_quality_encoding, paste=paste)
+        super().__init__(format, force_quality_encoding, paste=paste)
         self.id_manager = IDManager(sep)
 
     def join(self, read1, read2):
@@ -71,7 +70,7 @@ class FastqJoiner(fq.fastqJoiner):
         read1 = read1.convert_read_to_format(self.format, force_quality_encoding=force_quality_encoding)
         read2 = read2.convert_read_to_format(self.format, force_quality_encoding=force_quality_encoding)
         # --
-        t1, t2 = [self.id_manager.parse_id(r.identifier) for r in (read1, read2)]
+        t1, t2 = (self.id_manager.parse_id(r.identifier) for r in (read1, read2))
         if self.id_manager.get_read_number(t1) == 2:
             if not self.id_manager.get_read_number(t2) == 1:
                 raise RuntimeError("input files are not from mated pairs")
@@ -94,10 +93,10 @@ class FastqJoiner(fq.fastqJoiner):
         if force_quality_encoding == 'ascii':
             rval.quality = read1.quality + self.paste_ascii_quality + read2.quality
         else:
-            rval.quality = "%s %s" % (
+            rval.quality = "{} {}".format(
                 read1.quality.strip(), self.paste_decimal_quality
             )
-            rval.quality = ("%s %s" % (
+            rval.quality = ("{} {}".format(
                 rval.quality.strip(), read2.quality.strip()
             )).strip()
         return rval
@@ -113,7 +112,7 @@ def sniff_sep(fastq_fn):
             try:
                 header = f.next().strip()
             except StopIteration:
-                raise RuntimeError("%r: empty file" % (fastq_fn, ))
+                raise RuntimeError(f"{fastq_fn!r}: empty file")
     return re.search(r"\s", header).group()
 
 
@@ -130,7 +129,7 @@ def main():
     paste = sys.argv[7] or ''
     # --
     if input1_type != input2_type:
-        print("WARNING: You are trying to join files of two different types: %s and %s." % (input1_type, input2_type))
+        print(f"WARNING: You are trying to join files of two different types: {input1_type} and {input2_type}.")
 
     if fastq_style == 'new':
         sep = sniff_sep(input1_filename)
@@ -159,7 +158,7 @@ def main():
             print("Your file contains no valid FASTQ reads.")
         else:
             print(reader2.has_data())
-            print('Joined %s of %s read pairs (%.2f%%).' % (i - skip_count + 1, i + 1, (i - skip_count + 1) / (i + 1) * 100.0))
+            print(f'Joined {i - skip_count + 1} of {i + 1} read pairs ({(i - skip_count + 1) / (i + 1) * 100.0:.2f}%).')
 
 
 if __name__ == "__main__":

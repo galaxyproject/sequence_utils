@@ -1,6 +1,5 @@
 # Dan Blankenberg
 
-from __future__ import print_function
 
 import sys
 
@@ -37,7 +36,7 @@ def main():
     if qual_filename == 'None':
         qual_input = fastqFakeFastaScoreReader(format, quality_encoding=force_quality_encoding)
     else:
-        qual_input = fastaNamedReader(open(qual_filename, 'rt'))
+        qual_input = fastaNamedReader(open(qual_filename))
 
     fastq_combiner = fastqCombiner(format)
     i = None
@@ -45,7 +44,7 @@ def main():
 
     writer = fastqWriter(path=output_filename, format=format, force_quality_encoding=force_quality_encoding)
     with writer:
-        for i, sequence in enumerate(fastaReader(open(fasta_filename, 'rt'))):
+        for i, sequence in enumerate(fastaReader(open(fasta_filename))):
             quality = qual_input.get(sequence)
             if quality:
                 fastq_read = fastq_combiner.combine(sequence, quality)
@@ -57,7 +56,7 @@ def main():
         print("Your file contains no valid FASTA sequences.")
     else:
         print(qual_input.has_data())
-        print('Combined %s of %s sequences with quality scores (%.2f%%).' % (i - skip_count + 1, i + 1, float(i - skip_count + 1) / float(i + 1) * 100.0))
+        print(f'Combined {i - skip_count + 1} of {i + 1} sequences with quality scores ({float(i - skip_count + 1) / float(i + 1) * 100.0:.2f}%).')
 
 
 if __name__ == "__main__":

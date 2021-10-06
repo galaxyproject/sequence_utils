@@ -26,7 +26,7 @@ PROJECT_API = PROJECT_URL.replace("https://github.com/", "https://api.github.com
 
 def main(argv):
     history_path = os.path.join(PROJECT_DIRECTORY, "HISTORY.rst")
-    history = open(history_path, "r").read()
+    history = open(history_path).read()
 
     def extend(from_str, line):
         from_str += "\n"
@@ -38,19 +38,19 @@ def main(argv):
     if len(argv) > 2:
         message = argv[2]
     elif not (ident.startswith("pr") or ident.startswith("issue")):
-        api_url = urllib.parse.urljoin(PROJECT_API, "commits/%s" % ident)
+        api_url = urllib.parse.urljoin(PROJECT_API, f"commits/{ident}")
         req = requests.get(api_url).json()
         commit = req["commit"]
         message = commit["message"]
         message = get_first_sentence(message)
     elif requests is not None and ident.startswith("pr"):
         pull_request = ident[len("pr"):]
-        api_url = urllib.parse.urljoin(PROJECT_API, "pulls/%s" % pull_request)
+        api_url = urllib.parse.urljoin(PROJECT_API, f"pulls/{pull_request}")
         req = requests.get(api_url).json()
         message = req["title"]
     elif requests is not None and ident.startswith("issue"):
         issue = ident[len("issue"):]
-        api_url = urllib.parse.urljoin(PROJECT_API, "issues/%s" % issue)
+        api_url = urllib.parse.urljoin(PROJECT_API, f"issues/{issue}")
         req = requests.get(api_url).json()
         message = req["title"]
     else:
@@ -62,17 +62,17 @@ def main(argv):
         pull_request = ident[len("pr"):]
         text = ".. _Pull Request {0}: {1}/pull/{0}".format(pull_request, PROJECT_URL)
         history = extend(".. github_links", text)
-        to_doc += "`Pull Request {0}`_".format(pull_request)
+        to_doc += f"`Pull Request {pull_request}`_"
     elif ident.startswith("issue"):
         issue = ident[len("issue"):]
         text = ".. _Issue {0}: {1}/issues/{0}".format(issue, PROJECT_URL)
         history = extend(".. github_links", text)
-        to_doc += "`Issue {0}`_".format(issue)
+        to_doc += f"`Issue {issue}`_"
     else:
         short_rev = ident[:7]
         text = ".. _{0}: {1}/commit/{0}".format(short_rev, PROJECT_URL)
         history = extend(".. github_links", text)
-        to_doc += "{0}_".format(short_rev)
+        to_doc += f"{short_rev}_"
 
     to_doc = wrap(to_doc)
     history = extend(".. to_doc", to_doc)
