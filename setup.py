@@ -17,74 +17,18 @@ with open(f'{SOURCE_DIR}/__init__.py', 'rb') as f:
         match = pattern.search(init_contents).group(1)
         return str(ast.literal_eval(match))
 
-    version = get_var("__version__")
     PROJECT_NAME = get_var("PROJECT_NAME")
     PROJECT_URL = get_var("PROJECT_URL")
     PROJECT_AUTHOR = get_var("PROJECT_AUTHOR")
     PROJECT_EMAIL = get_var("PROJECT_EMAIL")
-
-TEST_DIR = 'tests'
-PROJECT_DESCRIPTION = 'Galaxy utilities for manipulating sequences Galaxy project.'
-PACKAGES = [
-    'galaxy_utils',
-    'galaxy_utils.sequence',
-    'galaxy_utils.sequence.scripts',
-]
-ENTRY_POINTS = '''
-        [console_scripts]
-        gx-fastq-to-tabular=galaxy_utils.sequence.scripts.fastq_to_tabular:main
-        gx-fastq-groomer=galaxy_utils.sequence.scripts.fastq_groomer:main
-        gx-fastq-combiner=galaxy_utils.sequence.scripts.fastq_combiner:main
-        gx-fastq-filter=galaxy_utils.sequence.scripts.fastq_filter:main
-        gx-fastq-manipulation=galaxy_utils.sequence.scripts.fastq_manipulation:main
-        gx-fastq-masker-by-quality=galaxy_utils.sequence.scripts.fastq_masker_by_quality:main
-        gx-fastq-paired-end-deinterlacer=galaxy_utils.sequence.scripts.fastq_paired_end_deinterlacer:main
-        gx-fastq-paired-end-interlacer=galaxy_utils.sequence.scripts.fastq_paired_end_interlacer:main
-        gx-fastq-paired-end-joiner=galaxy_utils.sequence.scripts.fastq_paired_end_joiner:main
-        gx-fastq-paired-end-splitter=galaxy_utils.sequence.scripts.fastq_paired_end_splitter:main
-        gx-fastq-stats=galaxy_utils.sequence.scripts.fastq_stats:main
-        gx-fastq-to-fasta=galaxy_utils.sequence.scripts.fastq_to_fasta:main
-        gx-fastq-trimmer=galaxy_utils.sequence.scripts.fastq_trimmer:main
-        gx-fastq-trimmer-by-quality=galaxy_utils.sequence.scripts.fastq_trimmer_by_quality:main
-'''
-PACKAGE_DATA = {}
-PACKAGE_DIR = {
-    SOURCE_DIR: SOURCE_DIR,
-}
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name=PROJECT_NAME,
-    version=version,
-    description=PROJECT_DESCRIPTION,
     long_description=readme + '\n\n' + history,
-    long_description_content_type='text/x-rst',
     author=PROJECT_AUTHOR,
     author_email=PROJECT_EMAIL,
     url=PROJECT_URL,
-    packages=PACKAGES,
-    entry_points=ENTRY_POINTS,
-    package_data=PACKAGE_DATA,
-    package_dir=PACKAGE_DIR,
-    include_package_data=True,
-    license="AFL",
-    zip_safe=False,
-    keywords='planemo',
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Environment :: Console',
-        'License :: OSI Approved :: Academic Free License (AFL)',
-        'Operating System :: POSIX',
-        'Topic :: Software Development',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-    ],
-    test_suite=TEST_DIR,
 )
