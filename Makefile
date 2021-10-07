@@ -57,11 +57,8 @@ setup-git-hook-lint: ## setup precommit hook for linting project
 setup-git-hook-lint-and-test: ## setup precommit hook for linting and testing project
 	cp $(BUILD_SCRIPTS_DIR)/pre-commit-lint-and-test .git/hooks/pre-commit
 
-flake8: ## check style using flake8 for current Python (faster than lint)
-	$(IN_VENV) flake8 $(SOURCE_DIR)  $(TEST_DIR)
-
-lint: ## check style using tox and flake8 for Python 2 and Python 3
-	$(IN_VENV) tox -e py27-lint && tox -e py35-lint
+lint: ## check style using tox and flake8
+	$(IN_VENV) tox -e py36-lint
 
 lint-readme: ## check README formatting for PyPI
 	$(IN_VENV) python setup.py check -r -s
