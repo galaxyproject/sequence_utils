@@ -638,8 +638,8 @@ class fastqReader(fileHandler):
             if not line:
                 self.close()
                 raise fastqFormatError(
-                    'Invalid FASTQ file: could not find quality score of \
-                    sequence identifier {}.'.format(rval.identifier))
+                    'Invalid FASTQ file: could not find quality score of '
+                    f'sequence identifier {rval.identifier}.')
             line = line.rstrip('\n\r')
 
             if not line.startswith('+'):
@@ -790,9 +790,9 @@ class fastqNamedReader(fastqReader):
                 eof = True
             self.file.seek(offset)
         if count:
-            rval = "There were %i known sequence reads not utilized. " % (count, )
+            rval = f"There were {count:d} known sequence reads not utilized. "
         if not eof:
-            rval = "{}{}".format(rval, "An additional unknown number of reads exist in the input that were not utilized.")
+            rval += "An additional unknown number of reads exist in the input that were not utilized."
         return rval
 
 
@@ -937,7 +937,7 @@ class fastqFakeFastaScoreReader:
         if self.quality_encoding == 'ascii':
             new_sequence.sequence = chr(self.fastq_read.ascii_max) * len(self.fastq_read.get_sequence())
         else:
-            new_sequence.sequence = ("%i " % (self.fastq_read.quality_max, )) * len(self.fastq_read.get_sequence())
+            new_sequence.sequence = (f"{self.fastq_read.quality_max:d} " * len(self.fastq_read.get_sequence()))
         return new_sequence
 
     def has_data(self):

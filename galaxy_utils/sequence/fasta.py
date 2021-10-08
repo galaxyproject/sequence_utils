@@ -113,9 +113,9 @@ class fastaNamedReader:
                 eof = True
             self.file.seek(offset)
         if count:
-            rval = "There were %i known sequences not utilized. " % (count, )
+            rval = f"There were {count:d} known sequences not utilized. "
         if not eof:
-            rval = "{}{}".format(rval, "An additional unknown number of sequences exist in the input that were not utilized.")
+            rval += "An additional unknown number of sequences exist in the input that were not utilized."
         return rval
 
 

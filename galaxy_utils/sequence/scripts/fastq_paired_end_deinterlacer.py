@@ -64,7 +64,7 @@ def main():
         print("Your input file contained no valid FASTQ sequences.")
     else:
         if skip_count:
-            print('There were %i reads with no mate.' % (skip_count, ))
+            print(f'There were {skip_count:d} reads with no mate.')
         print('De-interlaced %s pairs of sequences.' % ((i - skip_count + 1) / 2))
 
 

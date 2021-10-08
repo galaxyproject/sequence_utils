@@ -33,13 +33,13 @@ class IDManager:
 
     def join_id(self, parsed_id):
         coords, flags = parsed_id
-        return "@{}{}{}".format(":".join(coords), self.sep, ":".join(flags))
+        return f'@{":".join(coords)}{self.sep}{":".join(flags)}'
 
     def get_read_number(self, parsed_id):
         return int(parsed_id[1][0])
 
     def set_read_number(self, parsed_id, n):
-        parsed_id[1][0] = "%d" % (n, )
+        parsed_id[1][0] = f"{n:d}"
 
     def get_paired_identifier(self, read):
         t = self.parse_id(read.identifier)
@@ -49,7 +49,7 @@ class IDManager:
         elif n == 2:
             pn = 1
         else:
-            raise RuntimeError("Unknown read number '%d'" % (n, ))
+            raise RuntimeError(f"Unknown read number '{n:d}'")
         self.set_read_number(t, pn)
         return self.join_id(t)
 
@@ -93,12 +93,8 @@ class FastqJoiner(fq.fastqJoiner):
         if force_quality_encoding == 'ascii':
             rval.quality = read1.quality + self.paste_ascii_quality + read2.quality
         else:
-            rval.quality = "{} {}".format(
-                read1.quality.strip(), self.paste_decimal_quality
-            )
-            rval.quality = ("{} {}".format(
-                rval.quality.strip(), read2.quality.strip()
-            )).strip()
+            rval.quality = f"{read1.quality.strip()} {self.paste_decimal_quality}"
+            rval.quality = f"{rval.quality.strip()} {read2.quality.strip()}".strip()
         return rval
 
     def get_paired_identifier(self, read):
