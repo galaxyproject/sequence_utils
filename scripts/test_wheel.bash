@@ -26,4 +26,4 @@ virtualenv "$VIRTUALENV_DIRECTORY"
 pip install "${WHEEL_FILE}"
 pip install -r "${DEV_REQUIREMENTS}"
 
-nosetests tests
+pytest

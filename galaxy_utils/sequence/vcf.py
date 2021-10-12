@@ -4,7 +4,7 @@
 NOT_A_NUMBER = float('NaN')
 
 
-class VariantCall(object):
+class VariantCall:
     version = None
     header_startswith = None
     required_header_fields = None
@@ -12,7 +12,7 @@ class VariantCall(object):
 
     @classmethod
     def get_class_by_format(cls, format):
-        assert format in VCF_FORMATS, 'Unknown format type specified: %s' % format
+        assert format in VCF_FORMATS, f'Unknown format type specified: {format}'
         return VCF_FORMATS[format]
 
     def __init__(self, vcf_line, metadata, sample_names):
@@ -37,15 +37,15 @@ class VariantCall33(VariantCall):
         # parse line
         self.fields = self.line.split('\t')
         if sample_names:
-            assert len(self.fields) == self.required_header_length + len(sample_names) + 1, 'Provided VCF line (%s) has wrong length (expected: %i)' % (self.line, self.required_header_length + len(sample_names) + 1)
+            assert len(self.fields) == self.required_header_length + len(sample_names) + 1, f'Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length + len(sample_names) + 1:d})'
         else:
-            assert len(self.fields) == self.required_header_length, 'Provided VCF line (%s) has wrong length (expected: %i)' % (self.line, self.required_header_length)
+            assert len(self.fields) == self.required_header_length, f'Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length:d})'
         self.chrom, self.pos, self.id, self.ref, self.alt, self.qual, self.filter, self.info = self.fields[:self.required_header_length]
         self.pos = int(self.pos)
         self.alt = self.alt.split(',')
         try:
             self.qual = float(self.qual)
-        except:
+        except ValueError:
             self.qual = NOT_A_NUMBER  # Missing data can be denoted as a '.'
         if len(self.fields) > self.required_header_length:
             self.format = self.fields[self.required_header_length].split(':')
@@ -70,7 +70,7 @@ for format in [VariantCall33, VariantCall40, VariantCall41]:
     VCF_FORMATS[format.version] = format
 
 
-class Reader(object):
+class Reader:
     def __init__(self, fh):
         self.vcf_file = fh
         self.metadata = {}
@@ -88,7 +88,7 @@ class Reader(object):
             if self.vcf_class and line.startswith(self.vcf_class.header_startswith):
                 # read the header fields, ignoring any blank tabs, which GATK
                 # VCF produces after the sample
-                self.header_fields = [l for l in line.split('\t') if l]
+                self.header_fields = [field for field in line.split('\t') if field]
                 if len(self.header_fields) > self.vcf_class.required_header_length:
                     for sample_name in self.header_fields[self.vcf_class.required_header_length + 1:]:
                         self.sample_names.append(sample_name)
@@ -127,4 +127,3 @@ class Reader(object):
                 self.close()
                 # Catch exception and return normally
                 return
-

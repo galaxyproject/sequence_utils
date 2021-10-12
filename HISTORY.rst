@@ -6,6 +6,14 @@ History
 .. to_doc
 
 ---------------------
+Unreleased
+---------------------
+
+* Drop support for Python 3.5. Add support for Python 3.9 and 3.10.
+* Remove dependency on ``six``
+* Replace nose with pytest for unit testing
+
+---------------------
 1.1.5 (2020-02-18)
 ---------------------
 

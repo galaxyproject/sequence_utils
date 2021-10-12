@@ -1,5 +1,4 @@
 # Florent Angly
-from __future__ import print_function
 
 import sys
 
@@ -65,8 +64,8 @@ def main():
         print("Your input file contained no valid FASTQ sequences.")
     else:
         if skip_count:
-            print('There were %i reads with no mate.' % skip_count)
-        print('De-interlaced %s pairs of sequences.' % ((i - skip_count + 1) / 2))
+            print(f'There were {skip_count:d} reads with no mate.')
+        print(f'De-interlaced {(i - skip_count + 1) / 2} pairs of sequences.')
 
 
 if __name__ == "__main__":

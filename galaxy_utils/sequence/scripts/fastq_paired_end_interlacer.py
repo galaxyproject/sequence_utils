@@ -1,5 +1,4 @@
 # Florent Angly
-from __future__ import print_function
 
 import sys
 
@@ -20,7 +19,7 @@ def main():
     outfile_singles = sys.argv[6]
 
     if mate1_type != mate2_type:
-        print("WARNING: You are trying to interlace files of two different types: %s and %s." % (mate1_type, mate2_type))
+        print(f"WARNING: You are trying to interlace files of two different types: {mate1_type} and {mate2_type}.")
         return
 
     type = mate1_type
@@ -60,8 +59,8 @@ def main():
     if (i is None) and (j is None):
         print("Your input files contained no valid FASTQ sequences.")
     else:
-        print('There were %s single reads.' % (nof_singles))
-        print('Interlaced %s pairs of sequences.' % (nof_pairs))
+        print(f'There were {nof_singles} single reads.')
+        print(f'Interlaced {nof_pairs} pairs of sequences.')
 
 
 if __name__ == "__main__":

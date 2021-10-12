@@ -1,6 +1,5 @@
 # Dan Blankenberg
 
-from __future__ import print_function
 
 import sys
 
@@ -40,11 +39,11 @@ def main():
                 num_reads_excluded += 1
 
     if num_reads is None:
-        print("No valid fastq reads could be processed.")
+        print("No valid FASTQ reads could be processed.")
     else:
-        print("%i fastq reads were processed." % (num_reads + 1))
+        print(f"{num_reads + 1:d} FASTQ reads were processed.")
     if num_reads_excluded:
-        print("%i reads of zero length were excluded from the output." % num_reads_excluded)
+        print(f"{num_reads_excluded:d} reads of zero length were excluded from the output.")
 
 
 if __name__ == "__main__":

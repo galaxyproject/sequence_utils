@@ -1,5 +1,4 @@
 # Dan Blankenberg
-from __future__ import print_function
 
 import argparse
 
@@ -54,20 +53,21 @@ class Groomer():
 
     def _print_output(self, read_count, aggregator):
         if read_count is not None:
-            print("Groomed %i %s reads into %s reads." % (read_count + 1, self.input_type, self.output_type))
+            print(f"Groomed {read_count + 1:d} {self.input_type} reads into {self.output_type} reads.")
             if self.input_type != self.output_type and 'solexa' in [self.input_type, self.output_type]:
                 print("Converted between Solexa and PHRED scores.")
             if self.summarize_input:
                 print(
-                    "Based upon quality and sequence, the input data is valid for: %s" %
-                    (", ".join(aggregator.get_valid_formats()) or "None"))
+                    "Based upon quality and sequence, the input data is valid for:",
+                    ", ".join(aggregator.get_valid_formats()) or "None"
+                )
                 ascii_range = aggregator.get_ascii_range()
                 decimal_range = aggregator.get_decimal_range()
                 # print using repr, since \x00 (null) causes info truncation in galaxy when printed
                 print(
-                    "Input ASCII range: %s(%i) - %s(%i)" %
-                    (repr(ascii_range[0]), ord(ascii_range[0]), repr(ascii_range[1]), ord(ascii_range[1])))
-                print("Input decimal range: %i - %i" % (decimal_range[0], decimal_range[1]))
+                    f"Input ASCII range: {repr(ascii_range[0])}({ord(ascii_range[0]):d}) - {repr(ascii_range[1])}({ord(ascii_range[1]):d})"
+                )
+                print(f"Input decimal range: {decimal_range[0]:d} - {decimal_range[1]:d}")
         else:
             print("No valid FASTQ reads were provided.")
 

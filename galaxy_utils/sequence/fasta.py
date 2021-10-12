@@ -2,11 +2,8 @@
 import bz2
 import gzip
 
-import six
-from six import Iterator, string_types
 
-
-class fastaSequence(object):
+class fastaSequence:
     def __init__(self):
         self.identifier = None
         self.sequence = ''  # holds raw sequence string: no whitespace
@@ -15,10 +12,10 @@ class fastaSequence(object):
         return len(self.sequence)
 
     def __str__(self):
-        return "%s\n%s\n" % (self.identifier, self.sequence)
+        return f"{self.identifier}\n{self.sequence}\n"
 
 
-class fastaReader(Iterator):
+class fastaReader:
     def __init__(self, fh):
         self.file = fh
 
@@ -47,7 +44,7 @@ class fastaReader(Iterator):
             # i.e. in a less than ideal fashion
             line = line.rstrip()
             if ' ' in rval.sequence or ' ' in line:
-                rval.sequence = "%s%s " % (rval.sequence, line)
+                rval.sequence = f"{rval.sequence}{line} "
             else:
                 rval.sequence += line
             offset = self.file.tell()
@@ -62,7 +59,7 @@ class fastaReader(Iterator):
                 return
 
 
-class fastaNamedReader(object):
+class fastaNamedReader:
     def __init__(self, fh):
         self.file = fh
         self.reader = fastaReader(self.file)
@@ -73,7 +70,7 @@ class fastaNamedReader(object):
         return self.file.close()
 
     def get(self, sequence_id):
-        if not isinstance(sequence_id, string_types):
+        if not isinstance(sequence_id, str):
             sequence_id = sequence_id.identifier
         rval = None
         if sequence_id in self.offset_dict:
@@ -116,23 +113,20 @@ class fastaNamedReader(object):
                 eof = True
             self.file.seek(offset)
         if count:
-            rval = "There were %i known sequences not utilized. " % count
+            rval = f"There were {count:d} known sequences not utilized. "
         if not eof:
-            rval = "%s%s" % (rval, "An additional unknown number of sequences exist in the input that were not utilized.")
+            rval += "An additional unknown number of sequences exist in the input that were not utilized."
         return rval
 
 
-class fastaWriter(object):
+class fastaWriter:
     def __init__(self, fh=None, format=None, path=None):
         if fh is None:
             assert path is not None
             if format and format.endswith(".gz"):
                 fh = gzip.open(path, "wt")
             elif format and format.endswith(".bz2"):
-                if six.PY2:
-                    fh = bz2.BZ2File(path, mode="w")
-                else:
-                    fh = bz2.open(path, mode="wt")
+                fh = bz2.open(path, mode="wt")
             else:
                 fh = open(path, "wt")
         else:
@@ -144,7 +138,7 @@ class fastaWriter(object):
 
     def write(self, fasta_read):
         # this will include color space adapter base if applicable
-        self.file.write(">%s\n%s\n" % (fasta_read.identifier[1:], fasta_read.sequence))
+        self.file.write(f">{fasta_read.identifier[1:]}\n{fasta_read.sequence}\n")
 
     def close(self):
         return self.file.close()

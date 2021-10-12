@@ -1,6 +1,5 @@
 # Dan Blankenberg
 
-from __future__ import print_function
 
 import imp
 import os
@@ -39,7 +38,7 @@ def main():
     if i is None:
         print("Your file contains no valid FASTQ reads.")
     else:
-        print('Manipulated %s of %s reads (%.2f%%).' % (reads_manipulated, i + 1, float(reads_manipulated) / float(i + 1) * 100.0))
+        print(f'Manipulated {reads_manipulated} of {i + 1} reads ({float(reads_manipulated) / float(i + 1) * 100.0:.2f}%).')
 
 
 if __name__ == "__main__":

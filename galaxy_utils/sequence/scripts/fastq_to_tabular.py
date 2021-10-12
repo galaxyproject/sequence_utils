@@ -1,6 +1,5 @@
 # Dan Blankenberg
 
-from __future__ import print_function
 
 import sys
 
@@ -25,18 +24,18 @@ def main():
         if descr_split == 0:
             # Don't divide the description into multiple columns
             for num_reads, fastq_read in enumerate(reader):
-                out.write("%s\t%s\t%s\n" % (fastq_read.identifier[1:].replace('\t', ' '), fastq_read.sequence.replace('\t', ' '), fastq_read.quality.replace('\t', ' ')))
+                out.write("{}\t{}\t{}\n".format(fastq_read.identifier[1:].replace('\t', ' '), fastq_read.sequence.replace('\t', ' '), fastq_read.quality.replace('\t', ' ')))  # noqa: SFS201
         else:
             for num_reads, fastq_read in enumerate(reader):
                 words = fastq_read.identifier[1:].replace('\t', ' ').split(None, descr_split)
                 # pad with empty columns if required
                 words += [""] * (descr_split - len(words))
-                out.write("%s\t%s\t%s\n" % ("\t".join(words), fastq_read.sequence.replace('\t', ' '), fastq_read.quality.replace('\t', ' ')))
+                out.write("{}\t{}\t{}\n".format("\t".join(words), fastq_read.sequence.replace('\t', ' '), fastq_read.quality.replace('\t', ' ')))  # noqa: SFS201
 
     if num_reads is None:
         print("No valid FASTQ reads could be processed.")
     else:
-        print("%i FASTQ reads were converted to Tabular." % (num_reads + 1))
+        print(f"{num_reads + 1:d} FASTQ reads were converted to Tabular.")
 
 
 def _stop_err(msg):
