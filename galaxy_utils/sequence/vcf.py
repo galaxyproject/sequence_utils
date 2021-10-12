@@ -37,9 +37,9 @@ class VariantCall33(VariantCall):
         # parse line
         self.fields = self.line.split('\t')
         if sample_names:
-            assert len(self.fields) == self.required_header_length + len(sample_names) + 1, 'Provided VCF line (%s) has wrong length (expected: %i)' % (self.line, self.required_header_length + len(sample_names) + 1)
+            assert len(self.fields) == self.required_header_length + len(sample_names) + 1, f'Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length + len(sample_names) + 1:d})'
         else:
-            assert len(self.fields) == self.required_header_length, 'Provided VCF line (%s) has wrong length (expected: %i)' % (self.line, self.required_header_length)
+            assert len(self.fields) == self.required_header_length, f'Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length:d})'
         self.chrom, self.pos, self.id, self.ref, self.alt, self.qual, self.filter, self.info = self.fields[:self.required_header_length]
         self.pos = int(self.pos)
         self.alt = self.alt.split(',')

@@ -34,12 +34,12 @@ def main(argv):
         from_str += "\n"
         return history.replace(from_str, from_str + line + "\n")
 
-    history = extend(".. to_doc", """
+    history = extend(".. to_doc", f"""
 ---------------------
-{}.dev0
+{new_version}.dev0
 ---------------------
 
-""".format(new_version))
+""")
     open(history_path, "w").write(history)
 
     source_mod_path = os.path.join(PROJECT_DIRECTORY, source_dir, "__init__.py")

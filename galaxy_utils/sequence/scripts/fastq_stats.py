@@ -34,24 +34,27 @@ def main():
             valid_nucleotides = VALID_COLOR_SPACE
     for i in range(aggregator.get_max_read_length()):
         column_stats = aggregator.get_summary_statistics_for_column(i)
-        out.write('%d\t' % (i + 1))
-        out.write("%d\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%d\t%d\t" % tuple(column_stats[key] for key in SUMMARY_STAT_ORDER))
-        out.write('%s\t' % ','.join(map(str, column_stats['outliers'])))
+        out.write(f'{i + 1:d}\t')
+        out.write("{:d}\t{:d}\t{:d}\t{:d}\t{:f}\t{:f}\t{:f}\t{:f}\t{:f}\t{:d}\t{:d}\t".format(*(column_stats[key] for key in SUMMARY_STAT_ORDER)))  # noqa: SFS201
+        out.write(f"{','.join(map(str, column_stats['outliers']))}\t")
         base_counts = aggregator.get_base_counts_for_column(i)
         for nuc in valid_nucleotides:
             out.write(f"{base_counts.get(nuc, 0)}\t")
         extra_nucs = sorted(nuc for nuc in base_counts.keys() if nuc not in valid_nucleotides)
-        out.write("{}\t{}\n".format(','.join(extra_nucs), ','.join(str(base_counts[nuc]) for nuc in extra_nucs)))
+        out.write(f"{','.join(extra_nucs)}\t{','.join(str(base_counts[nuc]) for nuc in extra_nucs)}\n")
     out.close()
     if num_reads is None:
-        print("No valid fastq reads could be processed.")
+        print("No valid FASTQ reads could be processed.")
     else:
-        print("%i fastq reads were processed." % (num_reads + 1))
-        print("Based upon quality values and sequence characters, the input data is valid for: %s" % (", ".join(aggregator.get_valid_formats()) or "None"))
+        print(f"{num_reads + 1:d} FASTQ reads were processed.")
+        print(
+            "Based upon quality values and sequence characters, the input data is valid for:",
+            ", ".join(aggregator.get_valid_formats()) or "None"
+        )
         ascii_range = aggregator.get_ascii_range()
         decimal_range = aggregator.get_decimal_range()
-        print("Input ASCII range: %s(%i) - %s(%i)" % (repr(ascii_range[0]), ord(ascii_range[0]), repr(ascii_range[1]), ord(ascii_range[1])))  # print(using repr, since \x00 (null) causes info truncation in galaxy when printed)
-        print("Input decimal range: %i - %i" % (decimal_range[0], decimal_range[1]))
+        print(f"Input ASCII range: {repr(ascii_range[0])}({ord(ascii_range[0]):d}) - {repr(ascii_range[1])}({ord(ascii_range[1]):d})")  # print(using repr, since \x00 (null) causes info truncation in galaxy when printed)
+        print(f"Input decimal range: {decimal_range[0]:d} - {decimal_range[1]:d}")
 
 
 if __name__ == "__main__":

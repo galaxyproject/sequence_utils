@@ -60,17 +60,17 @@ def main(argv):
 
     if ident.startswith("pr"):
         pull_request = ident[len("pr"):]
-        text = ".. _Pull Request {0}: {1}/pull/{0}".format(pull_request, PROJECT_URL)
+        text = f".. _Pull Request {pull_request}: {PROJECT_URL}/pull/{pull_request}"
         history = extend(".. github_links", text)
         to_doc += f"`Pull Request {pull_request}`_"
     elif ident.startswith("issue"):
         issue = ident[len("issue"):]
-        text = ".. _Issue {0}: {1}/issues/{0}".format(issue, PROJECT_URL)
+        text = f".. _Issue {issue}: {PROJECT_URL}/issues/{issue}"
         history = extend(".. github_links", text)
         to_doc += f"`Issue {issue}`_"
     else:
         short_rev = ident[:7]
-        text = ".. _{0}: {1}/commit/{0}".format(short_rev, PROJECT_URL)
+        text = ".. _{short_rev}: {PROJECT_URL}/commit/{short_rev}"
         history = extend(".. github_links", text)
         to_doc += f"{short_rev}_"
 

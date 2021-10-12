@@ -25,7 +25,7 @@ def main():
     if num_reads is None:
         print("No valid FASTQ reads could be processed.")
     else:
-        print("%i FASTQ reads were converted to FASTA." % (num_reads + 1))
+        print(f"{num_reads + 1:d} FASTQ reads were converted to FASTA.")
 
 
 if __name__ == "__main__":

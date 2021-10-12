@@ -171,7 +171,7 @@ class fastqSequencingRead(SequencingRead):
             new_read.quality = "".join(score_list)
         else:  # decimal
             new_class.transform_scores_to_valid_range(score_list)
-            new_read.quality = "%s " % " ".join(score_list)  # need trailing space to be valid decimal fastq
+            new_read.quality = " ".join(score_list) + " "  # need trailing space to be valid decimal fastq
         return new_read
 
     def get_sequence(self):
@@ -187,7 +187,7 @@ class fastqSequencingRead(SequencingRead):
         else:
             quality = [str(_) for _ in self.get_decimal_quality_scores()[left_column_offset:right_column_offset]]
             if quality:
-                new_read.quality = "%s " % " ".join(quality)
+                new_read.quality = " ".join(quality) + " "
             else:
                 new_read.quality = ''
         return new_read
@@ -218,7 +218,7 @@ class fastqSequencingRead(SequencingRead):
     def assert_sequence_quality_lengths(self):
         qual_len = self.get_ascii_quality_scores_len()
         seq_len = len(self.sequence)
-        assert qual_len == seq_len, "Invalid FASTQ file: quality score length (%i) does not match sequence length (%i)" % (qual_len, seq_len)
+        assert qual_len == seq_len, f"Invalid FASTQ file: quality score length ({qual_len:d}) does not match sequence length ({seq_len:d})"
 
     def reverse(self, clone=True):
         # need to override how decimal quality scores are reversed
@@ -231,7 +231,7 @@ class fastqSequencingRead(SequencingRead):
             rval.quality = rval.quality[::-1]
         else:
             rval.quality = reversed(rval.get_decimal_quality_scores())
-            rval.quality = "%s " % " ".join(map(str, rval.quality))
+            rval.quality = " ".join(map(str, rval.quality)) + " "
         return rval
 
     def apply_galaxy_conventions(self):
@@ -297,7 +297,7 @@ class fastqCSSangerRead(fastqSequencingRead):
         if self.has_adapter_base():
             qual_len = self.get_ascii_quality_scores_len()
             seq_len = len(self.sequence)
-            assert qual_len + 1 == seq_len or qual_len == seq_len, "Invalid FASTQ file: quality score length (%i) does not match sequence length (%i with adapter base)" % (qual_len, seq_len)  # SRA adds FAKE/DUMMY quality scores to the adapter base, we'll allow the reading of the Improper score here, but remove it in the Reader when "apply_galaxy_conventions" is set to True
+            assert qual_len + 1 == seq_len or qual_len == seq_len, f"Invalid FASTQ file: quality score length ({qual_len:d}) does not match sequence length ({seq_len:d} with adapter base)"  # SRA adds FAKE/DUMMY quality scores to the adapter base, we'll allow the reading of the Improper score here, but remove it in the Reader when "apply_galaxy_conventions" is set to True
         else:
             return fastqSequencingRead.assert_sequence_quality_lengths(self)
 
@@ -323,7 +323,7 @@ class fastqCSSangerRead(fastqSequencingRead):
             rval.quality = rval.quality[::-1]
         else:
             rval.quality = reversed(rval.get_decimal_quality_scores())
-            rval.quality = "%s " % " ".join(map(str, rval.quality))
+            rval.quality = " ".join(map(str, rval.quality)) + " "
         return rval
 
     def complement(self, clone=True):
@@ -654,9 +654,9 @@ class fastqReader(fileHandler):
                 else:  # Line is not valid, sound the alarm!
                     self._close_on_error()
                     raise fastqFormatError(
-                        'Invalid FASTQ file: quality score identifier (%s) \
-                        does not match sequence identifier (%s).'
-                        % (line, rval.identifier))
+                        f'Invalid FASTQ file: quality score identifier ({line})'
+                        f'does not match sequence identifier ({rval.identifier}).'
+                    )
 
     def _read_fastq_qualityscores(self, rval):
         while rval.insufficient_quality_length():
@@ -725,7 +725,7 @@ class fastqVerboseErrorReader(fastqReader):
             error_offset = self.file.tell()
             error_byte_count = error_offset - last_good_end_offset
             print_error_bytes = min(self.MAX_PRINT_ERROR_BYTES, error_byte_count)
-            print("The error in your file occurs between lines '%i' and '%i', which corresponds to byte-offsets '%i' and '%i', and contains the text (%i of %i bytes shown):\n" % (last_readline_count + 1, self.file.readline_count, last_good_end_offset, error_offset, print_error_bytes, error_byte_count))
+            print(f"The error in your file occurs between lines '{last_readline_count + 1:d}' and '{self.file.readline_count:d}', which corresponds to byte-offsets '{last_good_end_offset:d}' and '{error_offset:d}', and contains the text ({print_error_bytes:d} of {error_byte_count:d} bytes shown):\n")
             self.file.seek(last_good_end_offset)
             print(self.file.read(print_error_bytes))
             self.file.close()
@@ -849,7 +849,7 @@ class fastqJoiner:
         rval = FASTQ_FORMATS[self.format]()
         rval.identifier = identifier
         if len(read1.description) > 1:
-            rval.description = "+%s" % (identifier[1:])
+            rval.description = "+" + identifier[1:]
         else:
             rval.description = '+'
         if rval.sequence_space == 'color':

@@ -59,8 +59,8 @@ def main():
     if (i is None) and (j is None):
         print("Your input files contained no valid FASTQ sequences.")
     else:
-        print('There were %s single reads.' % (nof_singles))
-        print('Interlaced %s pairs of sequences.' % (nof_pairs))
+        print(f'There were {nof_singles} single reads.')
+        print(f'Interlaced {nof_pairs} pairs of sequences.')
 
 
 if __name__ == "__main__":

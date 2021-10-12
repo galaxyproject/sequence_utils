@@ -88,7 +88,7 @@ def main():
             writer.write(fastq_read)
 
     if num_reads is not None:
-        print("Processed %i %s reads." % (num_reads + 1, options.format))
+        print(f"Processed {num_reads + 1:d} {options.format} reads.")
     else:
         print("No valid FASTQ reads were provided.")
 
