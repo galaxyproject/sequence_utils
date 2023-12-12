@@ -122,7 +122,7 @@ def test_fasta_reader_cleanup():
         reader = fastaReader(fh)
         for _ in reader:
             pass
-    assert(fh.closed)
+    assert fh.closed
 
 
 def test_fastq_reader_cleanup():
@@ -132,7 +132,7 @@ def test_fastq_reader_cleanup():
         with fastqReader(fh) as reader:
             for _ in reader:
                 pass
-    assert(fh.closed)
+    assert fh.closed
 
 
 def test_vcf_reader_cleanup():
@@ -142,7 +142,7 @@ def test_vcf_reader_cleanup():
         reader = vcfReader(fh)
         for _ in reader:
             pass
-    assert(fh.closed)
+    assert fh.closed
 
 
 def test_fastq_to_tabular():

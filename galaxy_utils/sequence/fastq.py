@@ -477,7 +477,7 @@ class fastqAggregator:
             halfed = int(size / 2)
             if size % 2 == 1:
                 return [halfed]
-            return[halfed - 1, halfed]
+            return [halfed - 1, halfed]
         read_count = self.get_read_count_for_column(i)
 
         min_score = self.get_score_min_for_column(i)
