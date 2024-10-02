@@ -10,10 +10,8 @@ SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd )"
 # Planemo to install for test.
 PLANEMO_INSTALL_TARGET="${PLANEMO_INSTALL_TARGET:-planemo}"
 
-# By default use pyton setup.py install to install the library.
-SETUP_COMMAND="${SETUP_COMMAND:-install}"
-
 TOOLS_DEVTEAM="${TOOLS_DEVTEAM:-}"
+TOOLS_IUC="${TOOLS_IUC:-}"
 
 # Initialize a temp directory for testing.
 TEMP_DIR=`mktemp -d`
@@ -26,21 +24,28 @@ virtualenv "$PLANEMO_VIRTUAL_ENV"
 pip install "$PLANEMO_INSTALL_TARGET"
 
 cd $SCRIPT_DIR/..
-python setup.py "$SETUP_COMMAND"
+pip install .
 
-if [ -z "$1" ];
-then
-    if [ -z "$TOOLS_DEVTEAM" ];
-    then
+if [ -z "$1" ]; then
+    if [ -z "$TOOLS_DEVTEAM" ]; then
         TOOLS_DEVTEAM="$TEMP_DIR/tools-devteam"
-        git clone https://github.com/galaxyproject/tools-devteam.git "$TOOLS_DEVTEAM"
+        git clone --depth=1 https://github.com/galaxyproject/tools-devteam.git "$TOOLS_DEVTEAM"
     fi
-    TARGET_TOOL_DIRS=(tools/fastq_trimmer_by_quality tool_collections/galaxy_sequence_utils/fastq_combiner tool_collections/galaxy_sequence_utils/fastq_manipulation tool_collections/galaxy_sequence_utils/fastq_groomer tool_collections/galaxy_sequence_utils/fastq_filter)
+    if [ -z "$TOOLS_IUC" ]; then
+        TOOLS_IUC="$TEMP_DIR/tools-iuc"
+        git clone --depth=1 https://github.com/galaxyproject/tools-iuc.git "$TOOLS_IUC"
+    fi
+    TARGET_TOOL_DIRS=(
+        "$TOOLS_DEVTEAM/tools/fastq_trimmer_by_quality"
+        "$TOOLS_IUC/tool_collections/galaxy_sequence_utils/fastq_combiner"
+        "$TOOLS_IUC/tool_collections/galaxy_sequence_utils/fastq_manipulation"
+        "$TOOLS_IUC/tool_collections/galaxy_sequence_utils/fastq_groomer"
+        "$TOOLS_IUC/tool_collections/galaxy_sequence_utils/fastq_filter"
+    )
 else
     TARGET_TOOL_DIRS=("$1")
 fi
 
-for tool_dir in ${TARGET_TOOL_DIRS[@]}
-do
-    planemo test --no_conda_auto_init --no_cleanup --no_dependency_resolution "$TOOLS_DEVTEAM/$tool_dir"
+for tool_dir in ${TARGET_TOOL_DIRS[@]}; do
+    planemo test --no_conda_auto_init --no_cleanup --no_dependency_resolution "$tool_dir"
 done
