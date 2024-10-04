@@ -23,12 +23,16 @@ GALAXY_VIRTUAL_ENV="$TEMP_DIR/galaxy-venv"
 python3 -m venv "$GALAXY_VIRTUAL_ENV"
 export GALAXY_VIRTUAL_ENV
 
-# Install Planemo and set up Galaxy
+# Install Planemo
 PLANEMO_VIRTUAL_ENV="${PLANEMO_VIRTUAL_ENV:-$TEMP_DIR/planemo-venv}"
 python3 -m venv "$PLANEMO_VIRTUAL_ENV"
 . "$PLANEMO_VIRTUAL_ENV/bin/activate"
 python3 -m pip install "$PLANEMO_INSTALL_TARGET"
-planemo ci_setup
+
+# Set up Galaxy for Planemo
+GALAXY_ROOT="${GALAXY_ROOT:-$TEMP_DIR/galaxy}"
+GALAXY_BRANCH="${GALAXY_BRANCH:-dev}"
+planemo ci_setup --galaxy_root "$GALAXY_ROOT" --galaxy_branch "$GALAXY_BRANCH"
 
 # Install sequence_utils into Galaxy virtual env
 cd $SCRIPT_DIR/..
@@ -56,6 +60,4 @@ else
 fi
 
 . "$PLANEMO_VIRTUAL_ENV/bin/activate"
-for tool_dir in ${TARGET_TOOL_DIRS[@]}; do
-    planemo test --no_conda_auto_init --no_cleanup --no_dependency_resolution "$tool_dir"
-done
+planemo test --galaxy_root "$GALAXY_ROOT" --galaxy_branch "$GALAXY_BRANCH" --no_conda_auto_init --no_cleanup --no_dependency_resolution "${TARGET_TOOL_DIRS[@]}"
