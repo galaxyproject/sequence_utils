@@ -6,7 +6,7 @@ History
 .. to_doc
 
 ---------------------
-Unreleased
+1.2.0 (2024-10-06)
 ---------------------
 
 * Drop support for Python < 3.8. Add support for Python 3.9-3.12.
