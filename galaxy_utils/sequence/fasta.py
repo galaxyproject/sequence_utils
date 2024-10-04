@@ -128,7 +128,7 @@ class fastaWriter:
             elif format and format.endswith(".bz2"):
                 fh = bz2.open(path, mode="wt")
             else:
-                fh = open(path, "wt")
+                fh = open(path, "w")
         else:
             if format and format.endswith(".gz"):
                 fh = gzip.GzipFile(fileobj=fh)

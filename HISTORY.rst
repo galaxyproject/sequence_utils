@@ -9,9 +9,11 @@ History
 Unreleased
 ---------------------
 
-* Drop support for Python 3.5. Add support for Python 3.9 and 3.10.
+* Drop support for Python < 3.8. Add support for Python 3.9-3.12.
 * Remove dependency on ``six``
 * Replace nose with pytest for unit testing
+* Fix imp module deprecated in Python 3.12 `Issue 30`_
+* Drop `setup.py` in favour of `setup.cfg`
 
 ---------------------
 1.1.5 (2020-02-18)
@@ -111,3 +113,4 @@ Unreleased
 .. _Pull Request 23: https://github.com/galaxyproject/sequence_utils/pull/23
 .. _Pull Request 24: https://github.com/galaxyproject/sequence_utils/pull/24
 .. _Pull Request 25: https://github.com/galaxyproject/sequence_utils/pull/25
+.. _Issue 30: https://github.com/galaxyproject/sequence_utils/issues/30

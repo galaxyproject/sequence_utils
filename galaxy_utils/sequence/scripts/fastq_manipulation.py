@@ -1,7 +1,6 @@
 # Dan Blankenberg
 
-
-import imp
+import importlib.util
 import os
 import shutil
 import sys
@@ -17,11 +16,19 @@ def main():
     additional_files_path = sys.argv[4]
     input_type = sys.argv[5] or 'sanger'
 
-    # Save script file for debuging/verification info later
-    os.mkdir(additional_files_path)
-    shutil.copy(script_filename, os.path.join(additional_files_path, 'debug.txt'))
+    # Save script file for debugging/verification info later
+    os.makedirs(additional_files_path, exist_ok=True)
+    new_script_path = os.path.join(additional_files_path, 'script.py')
+    shutil.copy(script_filename, new_script_path)
 
-    fastq_manipulator = imp.load_module('fastq_manipulator', open(script_filename), script_filename, ('', 'r', imp.PY_SOURCE))
+    spec = importlib.util.spec_from_file_location(
+        "fastq_manipulator",
+        new_script_path,
+    )
+    assert spec
+    fastq_manipulator = importlib.util.module_from_spec(spec)
+    assert spec.loader
+    spec.loader.exec_module(fastq_manipulator)
     i = None
     reads_manipulated = 0
 

@@ -18,13 +18,22 @@ TEMP_DIR=`mktemp -d`
 echo "Setting up test directory $TEMP_DIR"
 cd "$TEMP_DIR"
 
-PLANEMO_VIRTUAL_ENV="${PLANEMO_VIRTUAL_ENV:-$TEMP_DIR/planemo-venv}"
-virtualenv "$PLANEMO_VIRTUAL_ENV"
-. "$PLANEMO_VIRTUAL_ENV/bin/activate"
-pip install "$PLANEMO_INSTALL_TARGET"
+# Create a temporary virtual env for Galaxy and sequence_utils
+GALAXY_VIRTUAL_ENV="$TEMP_DIR/galaxy-venv"
+python3 -m venv "$GALAXY_VIRTUAL_ENV"
+export GALAXY_VIRTUAL_ENV
 
+# Install Planemo and set up Galaxy
+PLANEMO_VIRTUAL_ENV="${PLANEMO_VIRTUAL_ENV:-$TEMP_DIR/planemo-venv}"
+python3 -m venv "$PLANEMO_VIRTUAL_ENV"
+. "$PLANEMO_VIRTUAL_ENV/bin/activate"
+python3 -m pip install "$PLANEMO_INSTALL_TARGET"
+planemo ci_setup
+
+# Install sequence_utils into Galaxy virtual env
 cd $SCRIPT_DIR/..
-pip install .
+. "$GALAXY_VIRTUAL_ENV/bin/activate"
+python3 -m pip install --upgrade .
 
 if [ -z "$1" ]; then
     if [ -z "$TOOLS_DEVTEAM" ]; then
@@ -46,6 +55,7 @@ else
     TARGET_TOOL_DIRS=("$1")
 fi
 
+. "$PLANEMO_VIRTUAL_ENV/bin/activate"
 for tool_dir in ${TARGET_TOOL_DIRS[@]}; do
     planemo test --no_conda_auto_init --no_cleanup --no_dependency_resolution "$tool_dir"
 done

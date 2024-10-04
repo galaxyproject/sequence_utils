@@ -1,8 +1,6 @@
-# Default environment for make tox
-ENV?=py27
 # Extra arguments supplied to tox command
 ARGS?=
-# Location of virtualenv used for development.
+# Location of virtual env used for development.
 VENV?=.venv
 # Open resource on Mac OS X or Linux
 OPEN_RESOURCE=bash -c 'open $$0 || xdg-open $$0'
@@ -47,9 +45,9 @@ clean-test: ## remove test and coverage artifacts
 install: ## install into Python environment
 	python setup.py install
 
-setup-venv: ## setup a development virtualenv in current directory
-	if [ ! -d $(VENV) ]; then virtualenv $(VENV); exit; fi;
-	$(IN_VENV) pip install -r dev-requirements.txt
+setup-venv: ## setup a development virtual env in current directory
+	if [ ! -d $(VENV) ]; then python3 -m venv $(VENV); exit; fi;
+	$(IN_VENV) python3 -m pip install -r dev-requirements.txt
 
 setup-git-hook-lint: ## setup precommit hook for linting project
 	cp $(BUILD_SCRIPTS_DIR)/pre-commit-lint .git/hooks/pre-commit
@@ -58,7 +56,7 @@ setup-git-hook-lint-and-test: ## setup precommit hook for linting and testing pr
 	cp $(BUILD_SCRIPTS_DIR)/pre-commit-lint-and-test .git/hooks/pre-commit
 
 lint: ## check style using tox and flake8
-	$(IN_VENV) tox -e py36-lint
+	$(IN_VENV) tox -e lint
 
 lint-readme: ## check README formatting for PyPI
 	$(IN_VENV) python setup.py check -r -s
@@ -69,8 +67,8 @@ test: ## run tests with the default Python (faster than tox)
 tool-tests: ## Run tool tests against library in current state
 	bash tests/planemo_test.bash
 
-tox: ## run tests with tox in the specified ENV, defaults to py27
-	$(IN_VENV) tox -e $(ENV) -- $(ARGS)
+tox: ## run tests with tox
+	$(IN_VENV) tox -- $(ARGS)
 
 _coverage-report: ## build coverage report with the default Python
 	coverage run --source $(SOURCE_DIR) setup.py $(TEST_DIR)

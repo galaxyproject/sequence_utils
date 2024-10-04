@@ -10,7 +10,7 @@ from galaxy_utils.sequence.fastq import (
 )
 
 
-class Groomer():
+class Groomer:
 
     def __init__(self, file_handle=None):
         self.file_handle = file_handle

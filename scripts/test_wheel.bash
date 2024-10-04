@@ -21,7 +21,7 @@ cp -r "$PROJECT_DIRECTORY"/{.coveragerc,setup.cfg,tests} "$WORKING_DIRECTORY"
 
 cd "$WORKING_DIRECTORY"
 VIRTUALENV_DIRECTORY="$WORKING_DIRECTORY/venv"
-virtualenv "$VIRTUALENV_DIRECTORY"
+python3 -m venv "$VIRTUALENV_DIRECTORY"
 . "$VIRTUALENV_DIRECTORY/bin/activate"
 pip install "${WHEEL_FILE}"
 pip install -r "${DEV_REQUIREMENTS}"

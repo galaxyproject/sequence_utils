@@ -18,7 +18,7 @@ def main():
 
     num_reads = None
     fastq_read = None
-    out = open(output_filename, 'wt')
+    out = open(output_filename, "w")
 
     with fastqReader(path=input_filename, format=input_type) as reader:
         if descr_split == 0:
