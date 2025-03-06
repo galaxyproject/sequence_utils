@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.12']
+        python-version: ['3.9', '3.13']
         tox-env: ['lint', 'unit', 'tool-tests']
     steps:
       - uses: actions/checkout@v4
