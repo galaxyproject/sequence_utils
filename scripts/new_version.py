@@ -6,7 +6,6 @@ import subprocess
 import sys
 from distutils.version import StrictVersion
 
-
 PROJECT_DIRECTORY = os.path.join(os.path.dirname(__file__), "..")
 
 

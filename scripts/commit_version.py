@@ -6,7 +6,6 @@ import re
 import subprocess
 import sys
 
-
 PROJECT_DIRECTORY = os.path.join(os.path.dirname(__file__), "..")
 
 

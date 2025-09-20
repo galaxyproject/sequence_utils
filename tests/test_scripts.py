@@ -6,7 +6,10 @@ import unittest
 from tempfile import mkdtemp
 
 from galaxy_utils.sequence.fasta import fastaReader
-from galaxy_utils.sequence.fastq import fastqFormatError, fastqReader
+from galaxy_utils.sequence.fastq import (
+    fastqFormatError,
+    fastqReader,
+)
 from galaxy_utils.sequence.scripts import (
     fastq_combiner,
     fastq_groomer,

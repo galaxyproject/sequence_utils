@@ -3,7 +3,10 @@
 
 import sys
 
-from galaxy_utils.sequence.fastq import fastqReader, fastqWriter
+from galaxy_utils.sequence.fastq import (
+    fastqReader,
+    fastqWriter,
+)
 
 
 def main():

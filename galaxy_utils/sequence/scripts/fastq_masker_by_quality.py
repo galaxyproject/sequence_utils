@@ -2,7 +2,10 @@
 
 from optparse import OptionParser
 
-from galaxy_utils.sequence.fastq import fastqReader, fastqWriter
+from galaxy_utils.sequence.fastq import (
+    fastqReader,
+    fastqWriter,
+)
 
 
 def get_score_comparer(operator):

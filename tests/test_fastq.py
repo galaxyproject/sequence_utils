@@ -1,7 +1,10 @@
 import os
 import unittest
 
-from galaxy_utils.sequence.fastq import fastqFormatError, fastqReader
+from galaxy_utils.sequence.fastq import (
+    fastqFormatError,
+    fastqReader,
+)
 
 TEST_DIR = os.path.dirname(__file__)
 TEST_DATA_DIR = os.path.join(TEST_DIR, 'test_data')
