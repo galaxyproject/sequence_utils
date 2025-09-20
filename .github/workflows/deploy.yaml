@@ -11,11 +11,9 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install --upgrade build twine
+          python3 -m pip install --upgrade tox
       - name: Create and check sdist and wheel packages
-        run: |
-          python3 -m build
-          twine check dist/*
+        run: tox -e build
       - uses: actions/upload-artifact@v4
         with:
           name: packages

@@ -14,7 +14,6 @@ VERSION?=$(shell python $(BUILD_SCRIPTS_DIR)/print_version_for_release.py $(SOUR
 # TODO: get a RTD
 DOC_URL?=https://galaxy_utils.readthedocs.org
 PROJECT_URL?=https://github.com/galaxyproject/sequence_utils
-PROJECT_NAME?=sequence_utils
 TEST_DIR?=tests
 DOCS_DIR?=docs
 ITEM?=
@@ -38,7 +37,6 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 
@@ -108,29 +106,13 @@ open-rtd: docs ## open docs on readthedocs.org
 open-project: ## open project on github
 	$(OPEN_RESOURCE) $(PROJECT_URL)
 
-dist: clean ## package
-	$(IN_VENV) python setup.py sdist bdist_wheel
-	ls -l dist
-
-release-test-artifacts: dist ## Package and Upload to Test PyPi
-	$(IN_VENV) twine upload -r test dist/*
-	$(OPEN_RESOURCE) https://testpypi.python.org/pypi/$(PROJECT_NAME)
-
-release-artifacts: release-test-artifacts ## Package and Upload to PyPi
-	@while [ -z "$$CONTINUE" ]; do \
-		read -r -p "Have you executed release-test and reviewed results? [y/N]: " CONTINUE; \
-	done ; \
-	[ $$CONTINUE = "y" ] || [ $$CONTINUE = "Y" ] || (echo "Exiting."; exit 1;)
-	@echo "Releasing"
-	$(IN_VENV) twine upload dist/*
-
 commit-version: ## Update version and history, commit.
 	$(IN_VENV) python $(BUILD_SCRIPTS_DIR)/commit_version.py $(SOURCE_DIR) $(VERSION)
 
 new-version: ## Mint a new version
 	$(IN_VENV) python $(BUILD_SCRIPTS_DIR)/new_version.py $(SOURCE_DIR) $(VERSION)
 
-release-local: commit-version release-artifacts new-version
+release-local: commit-version new-version
 
 push-release: ## Push a tagged release to github
 	git push $(UPSTREAM) master
