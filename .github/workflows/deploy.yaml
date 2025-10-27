@@ -17,7 +17,7 @@ jobs:
           python3 -m pip install --upgrade tox
       - name: Create and check sdist and wheel packages
         run: tox -e build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: packages
           path: dist/
