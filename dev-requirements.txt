@@ -4,8 +4,7 @@ pytest
 pytest-cov
 
 #Building Docs
-sphinx==1.3.6
-# Sphinx bug with latest typing https://github.com/sphinx-doc/sphinx/issues/2470
+sphinx
 sphinx_rtd_theme
 
 # Used to check readme.
