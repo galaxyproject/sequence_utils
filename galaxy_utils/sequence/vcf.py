@@ -1,7 +1,7 @@
 # Dan Blankenberg
 # See http://www.1000genomes.org/wiki/Analysis/variant-call-format
 
-NOT_A_NUMBER = float('NaN')
+NOT_A_NUMBER = float("NaN")
 
 
 class VariantCall:
@@ -12,56 +12,69 @@ class VariantCall:
 
     @classmethod
     def get_class_by_format(cls, format):
-        assert format in VCF_FORMATS, f'Unknown format type specified: {format}'
+        assert format in VCF_FORMATS, f"Unknown format type specified: {format}"
         return VCF_FORMATS[format]
 
     def __init__(self, vcf_line, metadata, sample_names):
-        raise Exception('Abstract Method')
+        raise Exception("Abstract Method")
 
 
 class VariantCall33(VariantCall):
-    version = 'VCFv3.3'
-    header_startswith = '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO'
-    required_header_fields = header_startswith.split('\t')
+    version = "VCFv3.3"
+    header_startswith = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO"
+    required_header_fields = header_startswith.split("\t")
     required_header_length = len(required_header_fields)
 
     def __init__(self, vcf_line, metadata, sample_names):
         # Raw line is needed for indexing file.
         self.raw_line = vcf_line
-        self.line = vcf_line.rstrip('\n\r')
+        self.line = vcf_line.rstrip("\n\r")
         self.metadata = metadata
         self.sample_names = sample_names
         self.format = None
         self.sample_values = []
 
         # parse line
-        self.fields = self.line.split('\t')
+        self.fields = self.line.split("\t")
         if sample_names:
-            assert len(self.fields) == self.required_header_length + len(sample_names) + 1, f'Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length + len(sample_names) + 1:d})'
+            assert (
+                len(self.fields) == self.required_header_length + len(sample_names) + 1
+            ), f"Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length + len(sample_names) + 1:d})"
         else:
-            assert len(self.fields) == self.required_header_length, f'Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length:d})'
-        self.chrom, self.pos, self.id, self.ref, self.alt, self.qual, self.filter, self.info = self.fields[:self.required_header_length]
+            assert (
+                len(self.fields) == self.required_header_length
+            ), f"Provided VCF line ({self.line}) has wrong length (expected: {self.required_header_length:d})"
+        (
+            self.chrom,
+            self.pos,
+            self.id,
+            self.ref,
+            self.alt,
+            self.qual,
+            self.filter,
+            self.info,
+        ) = self.fields[: self.required_header_length]
         self.pos = int(self.pos)
-        self.alt = self.alt.split(',')
+        self.alt = self.alt.split(",")
         try:
             self.qual = float(self.qual)
         except ValueError:
             self.qual = NOT_A_NUMBER  # Missing data can be denoted as a '.'
         if len(self.fields) > self.required_header_length:
-            self.format = self.fields[self.required_header_length].split(':')
-            for sample_value in self.fields[self.required_header_length + 1:]:
-                self.sample_values.append(sample_value.split(':'))
+            self.format = self.fields[self.required_header_length].split(":")
+            for sample_value in self.fields[self.required_header_length + 1 :]:
+                self.sample_values.append(sample_value.split(":"))
 
 
 class VariantCall40(VariantCall33):
-    version = 'VCFv4.0'
+    version = "VCFv4.0"
 
     def __init__(self, vcf_line, metadata, sample_names):
         VariantCall33.__init__(self, vcf_line, metadata, sample_names)
 
 
 class VariantCall41(VariantCall40):
-    version = 'VCFv4.1'
+    version = "VCFv4.1"
 
 
 # VCF Format version lookup dict
@@ -83,19 +96,19 @@ class Reader:
         while True:
             line = self.vcf_file.readline()
             self.metadata_len += len(line)
-            assert line, 'Invalid VCF file provided.'
-            line = line.rstrip('\r\n')
+            assert line, "Invalid VCF file provided."
+            line = line.rstrip("\r\n")
             if self.vcf_class and line.startswith(self.vcf_class.header_startswith):
                 # read the header fields, ignoring any blank tabs, which GATK
                 # VCF produces after the sample
-                self.header_fields = [field for field in line.split('\t') if field]
+                self.header_fields = [field for field in line.split("\t") if field]
                 if len(self.header_fields) > self.vcf_class.required_header_length:
-                    for sample_name in self.header_fields[self.vcf_class.required_header_length + 1:]:
+                    for sample_name in self.header_fields[self.vcf_class.required_header_length + 1 :]:
                         self.sample_names.append(sample_name)
                 break
-            assert line.startswith('##'), 'Non-metadata line found before header'
+            assert line.startswith("##"), "Non-metadata line found before header"
             line = line[2:]  # strip ##
-            metadata = line.split('=', 1)
+            metadata = line.split("=", 1)
             metadata_name = metadata[0]
             if len(metadata) == 2:
                 metadata_value = metadata[1]
@@ -107,7 +120,7 @@ class Reader:
                 self.metadata[metadata_name].append(metadata_value)
             else:
                 self.metadata[metadata_name] = metadata_value
-            if metadata_name == 'fileformat':
+            if metadata_name == "fileformat":
                 self.vcf_class = VariantCall.get_class_by_format(metadata_value)
 
     def close(self):

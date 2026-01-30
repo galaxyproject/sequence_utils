@@ -13,17 +13,17 @@ LETTERS = string.ascii_letters
 
 
 class fastqSequencingRead(SequencingRead):
-    format = 'sanger'  # sanger is default
+    format = "sanger"  # sanger is default
     ascii_min = 33
     ascii_max = 126
     quality_min = 0
     quality_max = 93
-    score_system = 'phred'  # phred or solexa
-    sequence_space = 'base'  # base or color
+    score_system = "phred"  # phred or solexa
+    sequence_space = "base"  # base or color
 
     @classmethod
     def get_class_by_format(cls, format):
-        assert format in FASTQ_FORMATS, f'Unknown format type specified: {format}'
+        assert format in FASTQ_FORMATS, f"Unknown format type specified: {format}"
         return FASTQ_FORMATS[format]
 
     @classmethod
@@ -32,18 +32,21 @@ class fastqSequencingRead(SequencingRead):
             if score <= 0:  # can't take log10( 1 - 1 ); make <= 0 into -5
                 return -5
             return int(round(10.0 * math.log10(math.pow(10.0, (float(score) / 10.0)) - 1.0)))
+
         return [phred_to_solexa(_) for _ in decimal_score_list]
 
     @classmethod
     def convert_score_solexa_to_phred(cls, decimal_score_list):
         def solexa_to_phred(score):
             return int(round(10.0 * math.log10(math.pow(10.0, (float(score) / 10.0)) + 1.0)))
+
         return [solexa_to_phred(_) for _ in decimal_score_list]
 
     @classmethod
     def restrict_scores_to_valid_range(cls, decimal_score_list):
         def restrict_score(score):
             return max(min(score, cls.quality_max), cls.quality_min)
+
         return [restrict_score(_) for _ in decimal_score_list]
 
     @classmethod
@@ -86,9 +89,9 @@ class fastqSequencingRead(SequencingRead):
 
     def is_ascii_encoded(self):
         # as per fastq definition only decimal quality strings can have spaces (and TABs for our purposes) in them (and must have a trailing space)
-        if ' ' in self.quality:
+        if " " in self.quality:
             return False
-        if '\t' in self.quality:
+        if "\t" in self.quality:
             return False
         return True
 
@@ -102,7 +105,9 @@ class fastqSequencingRead(SequencingRead):
                     to_quality = self.ascii_min - self.quality_min
                     return [chr(int(val) + to_quality) for val in quality.split()]
                 except ValueError as e:
-                    raise ValueError(f'Error Parsing quality String. ASCII quality strings cannot contain spaces ({self.quality}): {e}')
+                    raise ValueError(
+                        f"Error Parsing quality String. ASCII quality strings cannot contain spaces ({self.quality}): {e}"
+                    )
             else:
                 return []
 
@@ -119,7 +124,9 @@ class fastqSequencingRead(SequencingRead):
                 try:
                     return len(quality.split())
                 except ValueError as e:
-                    raise ValueError(f'Error Parsing quality String. ASCII quality strings cannot contain spaces ({self.quality}): {e}')
+                    raise ValueError(
+                        f"Error Parsing quality String. ASCII quality strings cannot contain spaces ({self.quality}): {e}"
+                    )
             else:
                 return 0
 
@@ -138,22 +145,26 @@ class fastqSequencingRead(SequencingRead):
                 return []
 
     def convert_read_to_format(self, format, force_quality_encoding=None):
-        assert format in FASTQ_FORMATS, f'Unknown format type specified: {format}'
-        assert force_quality_encoding in [None, 'ascii', 'decimal'], f'Invalid force_quality_encoding: {force_quality_encoding}'
+        assert format in FASTQ_FORMATS, f"Unknown format type specified: {format}"
+        assert force_quality_encoding in [
+            None,
+            "ascii",
+            "decimal",
+        ], f"Invalid force_quality_encoding: {force_quality_encoding}"
         new_class = FASTQ_FORMATS[format]
         new_read = new_class()
         new_read.identifier = self.identifier
         if self.sequence_space == new_class.sequence_space:
             new_read.sequence = self.sequence
         else:
-            if self.sequence_space == 'base':
+            if self.sequence_space == "base":
                 new_read.sequence = self.convert_base_to_color_space(self.sequence)
             else:
                 new_read.sequence = self.convert_color_to_base_space(self.sequence)
         new_read.description = self.description
         is_ascii = self.is_ascii_encoded()
         if self.score_system != new_read.score_system:
-            if self.score_system == 'phred':
+            if self.score_system == "phred":
                 score_list = self.convert_score_phred_to_solexa(self.__get_decimal_quality_scores(is_ascii))
             else:
                 score_list = self.convert_score_solexa_to_phred(self.__get_decimal_quality_scores(is_ascii))
@@ -161,12 +172,12 @@ class fastqSequencingRead(SequencingRead):
             score_list = self.__get_decimal_quality_scores(is_ascii)
         if force_quality_encoding is None:
             if is_ascii:
-                new_encoding = 'ascii'
+                new_encoding = "ascii"
             else:
-                new_encoding = 'decimal'
+                new_encoding = "decimal"
         else:
             new_encoding = force_quality_encoding
-        if new_encoding == 'ascii':
+        if new_encoding == "ascii":
             new_class.transform_scores_to_valid_range_ascii(score_list)
             new_read.quality = "".join(score_list)
         else:  # decimal
@@ -189,7 +200,7 @@ class fastqSequencingRead(SequencingRead):
             if quality:
                 new_read.quality = " ".join(quality) + " "
             else:
-                new_read.quality = ''
+                new_read.quality = ""
         return new_read
 
     def is_valid_format(self):
@@ -218,7 +229,9 @@ class fastqSequencingRead(SequencingRead):
     def assert_sequence_quality_lengths(self):
         qual_len = self.get_ascii_quality_scores_len()
         seq_len = len(self.sequence)
-        assert qual_len == seq_len, f"Invalid FASTQ file: quality score length ({qual_len:d}) does not match sequence length ({seq_len:d})"
+        assert (
+            qual_len == seq_len
+        ), f"Invalid FASTQ file: quality score length ({qual_len:d}) does not match sequence length ({seq_len:d})"
 
     def reverse(self, clone=True):
         # need to override how decimal quality scores are reversed
@@ -239,44 +252,44 @@ class fastqSequencingRead(SequencingRead):
 
 
 class fastqSangerRead(fastqSequencingRead):
-    format = 'sanger'
+    format = "sanger"
     ascii_min = 33
     ascii_max = 126
     quality_min = 0
     quality_max = 93
-    score_system = 'phred'
-    sequence_space = 'base'
+    score_system = "phred"
+    sequence_space = "base"
 
 
 class fastqIlluminaRead(fastqSequencingRead):
-    format = 'illumina'
+    format = "illumina"
     ascii_min = 64
     ascii_max = 126
     quality_min = 0
     quality_max = 62
-    score_system = 'phred'
-    sequence_space = 'base'
+    score_system = "phred"
+    sequence_space = "base"
 
 
 class fastqSolexaRead(fastqSequencingRead):
-    format = 'solexa'
+    format = "solexa"
     ascii_min = 59
     ascii_max = 126
     quality_min = -5
     quality_max = 62
-    score_system = 'solexa'
-    sequence_space = 'base'
+    score_system = "solexa"
+    sequence_space = "base"
 
 
 class fastqCSSangerRead(fastqSequencingRead):
-    format = 'cssanger'  # color space
+    format = "cssanger"  # color space
     ascii_min = 33
     ascii_max = 126
     quality_min = 0
     quality_max = 93
-    score_system = 'phred'
-    sequence_space = 'color'
-    valid_sequence_list = [str(_) for _ in range(7)] + ['.']
+    score_system = "phred"
+    sequence_space = "color"
+    valid_sequence_list = [str(_) for _ in range(7)] + ["."]
 
     def __len__(self):
         if self.has_adapter_base():  # Adapter base is not counted in length of read
@@ -297,7 +310,9 @@ class fastqCSSangerRead(fastqSequencingRead):
         if self.has_adapter_base():
             qual_len = self.get_ascii_quality_scores_len()
             seq_len = len(self.sequence)
-            assert qual_len + 1 == seq_len or qual_len == seq_len, f"Invalid FASTQ file: quality score length ({qual_len:d}) does not match sequence length ({seq_len:d} with adapter base)"  # SRA adds FAKE/DUMMY quality scores to the adapter base, we'll allow the reading of the Improper score here, but remove it in the Reader when "apply_galaxy_conventions" is set to True
+            assert (
+                qual_len + 1 == seq_len or qual_len == seq_len
+            ), f"Invalid FASTQ file: quality score length ({qual_len:d}) does not match sequence length ({seq_len:d} with adapter base)"  # SRA adds FAKE/DUMMY quality scores to the adapter base, we'll allow the reading of the Improper score here, but remove it in the Reader when "apply_galaxy_conventions" is set to True
         else:
             return fastqSequencingRead.assert_sequence_quality_lengths(self)
 
@@ -315,7 +330,10 @@ class fastqCSSangerRead(fastqSequencingRead):
         if rval.has_adapter_base():
             adapter = rval.sequence[0]
             # sequence = rval.sequence[1:]
-            rval.sequence = self.color_space_converter.to_color_space(transform.reverse(self.color_space_converter.to_base_space(rval.sequence)), adapter_base=adapter)
+            rval.sequence = self.color_space_converter.to_color_space(
+                transform.reverse(self.color_space_converter.to_base_space(rval.sequence)),
+                adapter_base=adapter,
+            )
         else:
             rval.sequence = transform.reverse(rval.sequence)
 
@@ -335,7 +353,7 @@ class fastqCSSangerRead(fastqSequencingRead):
         if rval.has_adapter_base():  # No adapter, color space stays the same
             adapter = rval.sequence[0]
             sequence = rval.sequence[1:]
-            if adapter.lower() != 'u':
+            if adapter.lower() != "u":
                 adapter = transform.DNA_complement(adapter)
             else:
                 adapter = transform.RNA_complement(adapter)
@@ -351,7 +369,10 @@ class fastqCSSangerRead(fastqSequencingRead):
         if rval.has_adapter_base():
             if new_adapter:
                 if new_adapter != rval.sequence[0]:
-                    rval.sequence = rval.color_space_converter.to_color_space(rval.color_space_converter.to_base_space(rval.sequence), adapter_base=new_adapter)
+                    rval.sequence = rval.color_space_converter.to_color_space(
+                        rval.color_space_converter.to_base_space(rval.sequence),
+                        adapter_base=new_adapter,
+                    )
             else:
                 rval.sequence = rval.sequence[1:]
         elif new_adapter:
@@ -359,7 +380,9 @@ class fastqCSSangerRead(fastqSequencingRead):
         return rval
 
     def apply_galaxy_conventions(self):
-        if self.has_adapter_base() and len(self.sequence) == len(self.get_ascii_quality_scores()):  # SRA adds FAKE/DUMMY quality scores to the adapter base, we remove them here
+        if self.has_adapter_base() and len(self.sequence) == len(
+            self.get_ascii_quality_scores()
+        ):  # SRA adds FAKE/DUMMY quality scores to the adapter base, we remove them here
             if self.is_ascii_encoded():
                 self.quality = self.quality[1:]
             else:
@@ -478,6 +501,7 @@ class fastqAggregator:
             if size % 2 == 1:
                 return [halfed]
             return [halfed - 1, halfed]
+
         read_count = self.get_read_count_for_column(i)
 
         min_score = self.get_score_min_for_column(i)
@@ -522,18 +546,20 @@ class fastqAggregator:
             else:
                 outliers.append(score)
 
-        column_stats = {'read_count': read_count,
-                        'min_score': min_score,
-                        'max_score': max_score,
-                        'sum_score': sum_score,
-                        'mean_score': mean_score,
-                        'q1': q1,
-                        'med_score': med_score,
-                        'q3': q3,
-                        'iqr': iqr,
-                        'left_whisker': left_whisker,
-                        'right_whisker': right_whisker,
-                        'outliers': outliers}
+        column_stats = {
+            "read_count": read_count,
+            "min_score": min_score,
+            "max_score": max_score,
+            "sum_score": sum_score,
+            "mean_score": mean_score,
+            "q1": q1,
+            "med_score": med_score,
+            "q3": q3,
+            "iqr": iqr,
+            "left_whisker": left_whisker,
+            "right_whisker": right_whisker,
+            "outliers": outliers,
+        }
         return column_stats
 
 
@@ -594,10 +620,16 @@ class fileHandler:
 
 class fastqReader(fileHandler):
 
-    mode = 'r'
+    mode = "r"
 
     def __init__(
-            self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None, fix_id=False):
+        self,
+        fh=None,
+        format="sanger",
+        apply_galaxy_conventions=False,
+        path=None,
+        fix_id=False,
+    ):
         super().__init__(fh=fh, format=format, path=path)
         self.apply_galaxy_conventions = apply_galaxy_conventions
         self.fix_id = fix_id  # fix inconsistent identifiers (source: SRA data dumps)
@@ -622,13 +654,13 @@ class fastqReader(fileHandler):
             line = self.file.readline()
             if not line:
                 raise StopIteration
-            line = line.rstrip('\n\r')
+            line = line.rstrip("\n\r")
             if line:
                 break
 
-        if not line.startswith('@'):
+        if not line.startswith("@"):
             self.close()
-            raise fastqFormatError(f'Invalid FASTQ header: {line}')
+            raise fastqFormatError(f"Invalid FASTQ header: {line}")
 
         return line
 
@@ -638,24 +670,24 @@ class fastqReader(fileHandler):
             if not line:
                 self.close()
                 raise fastqFormatError(
-                    'Invalid FASTQ file: could not find quality score of '
-                    f'sequence identifier {rval.identifier}.')
-            line = line.rstrip('\n\r')
+                    f"Invalid FASTQ file: could not find quality score of sequence identifier {rval.identifier}."
+                )
+            line = line.rstrip("\n\r")
 
-            if not line.startswith('+'):
+            if not line.startswith("+"):
                 rval.append_sequence(line)
             else:  # Sequence is over, read the quality score identifier
                 if len(line) == 1 or line[1:] == id_line[1:]:  # Line is valid
                     rval.description = line
                     break
                 elif self.fix_id:  # Line is not valid, but we must fix it
-                    rval.description = '+'
+                    rval.description = "+"
                     break
                 else:  # Line is not valid, sound the alarm!
                     self._close_on_error()
                     raise fastqFormatError(
-                        f'Invalid FASTQ file: quality score identifier ({line})'
-                        f'does not match sequence identifier ({rval.identifier}).'
+                        f"Invalid FASTQ file: quality score identifier ({line})"
+                        f"does not match sequence identifier ({rval.identifier})."
                     )
 
     def _read_fastq_qualityscores(self, rval):
@@ -664,7 +696,7 @@ class fastqReader(fileHandler):
             if not line:
                 break
 
-            line = line.rstrip('\n\r')
+            line = line.rstrip("\n\r")
             rval.append_quality(line)
 
     def __iter__(self):
@@ -717,7 +749,9 @@ class fastqVerboseErrorReader(fastqReader):
         except StopIteration as e:
             raise e
         except Exception as e:
-            print(f"There was an error reading your input file. Your input file is likely malformed.\nIt is suggested that you double-check your original input file for errors -- helpful information for this purpose has been provided below.\nHowever, if you think that you have encountered an actual error with this tool, please do tell us by using the bug reporting mechanism.\n\nThe reported error is: '{e}'.")
+            print(
+                f"There was an error reading your input file. Your input file is likely malformed.\nIt is suggested that you double-check your original input file for errors -- helpful information for this purpose has been provided below.\nHowever, if you think that you have encountered an actual error with this tool, please do tell us by using the bug reporting mechanism.\n\nThe reported error is: '{e}'."
+            )
             if self.last_good_identifier is not None:
                 print(f"The last valid FASTQ read had an identifier of '{self.last_good_identifier}'.")
             else:
@@ -725,7 +759,9 @@ class fastqVerboseErrorReader(fastqReader):
             error_offset = self.file.tell()
             error_byte_count = error_offset - last_good_end_offset
             print_error_bytes = min(self.MAX_PRINT_ERROR_BYTES, error_byte_count)
-            print(f"The error in your file occurs between lines '{last_readline_count + 1:d}' and '{self.file.readline_count:d}', which corresponds to byte-offsets '{last_good_end_offset:d}' and '{error_offset:d}', and contains the text ({print_error_bytes:d} of {error_byte_count:d} bytes shown):\n")
+            print(
+                f"The error in your file occurs between lines '{last_readline_count + 1:d}' and '{self.file.readline_count:d}', which corresponds to byte-offsets '{last_good_end_offset:d}' and '{error_offset:d}', and contains the text ({print_error_bytes:d} of {error_byte_count:d} bytes shown):\n"
+            )
             self.file.seek(last_good_end_offset)
             print(self.file.read(print_error_bytes))
             self.file.close()
@@ -733,8 +769,13 @@ class fastqVerboseErrorReader(fastqReader):
 
 
 class fastqNamedReader(fastqReader):
-    def __init__(self, fh=None, format='sanger', apply_galaxy_conventions=False, path=None):
-        super().__init__(fh=fh, format=format, apply_galaxy_conventions=apply_galaxy_conventions, path=path)
+    def __init__(self, fh=None, format="sanger", apply_galaxy_conventions=False, path=None):
+        super().__init__(
+            fh=fh,
+            format=format,
+            apply_galaxy_conventions=apply_galaxy_conventions,
+            path=path,
+        )
         self.offset_dict = {}
         self.eof = False
 
@@ -744,7 +785,7 @@ class fastqNamedReader(fastqReader):
             # Input was a sequence object (not a sequence ID). Get the sequence ID
             sequence_identifier = sequence_identifier.identifier
         # Get only the ID part of the sequence header
-        sequence_id, sequence_sep, sequence_desc = sequence_identifier.partition(' ')
+        sequence_id, sequence_sep, sequence_desc = sequence_identifier.partition(" ")
         rval = None
         if sequence_id in self.offset_dict:
             initial_offset = self.file.tell()
@@ -763,7 +804,7 @@ class fastqNamedReader(fastqReader):
                 except StopIteration:
                     self.eof = True
                     break  # eof, id not found, will return None
-                fastq_read_id, fastq_read_sep, fastq_read_desc = fastq_read.identifier.partition(' ')
+                fastq_read_id, fastq_read_sep, fastq_read_desc = fastq_read.identifier.partition(" ")
                 if fastq_read_id == sequence_id:
                     rval = fastq_read
                     break
@@ -779,7 +820,7 @@ class fastqNamedReader(fastqReader):
         # returns a string representation of remaining data, or empty string (False) if no data remaining
         eof = self.eof
         count = 0
-        rval = ''
+        rval = ""
         if self.offset_dict:
             count = sum(map(len, self.offset_dict.values()))
         if not eof:
@@ -798,7 +839,7 @@ class fastqNamedReader(fastqReader):
 
 class fastqWriter(fileHandler):
 
-    mode = 'w'
+    mode = "w"
 
     def __init__(self, fh=None, format=None, force_quality_encoding=None, path=None):
         super().__init__(fh=fh, format=format, path=path)
@@ -806,7 +847,9 @@ class fastqWriter(fileHandler):
 
     def write(self, fastq_read):
         if self.format:
-            fastq_read = fastq_read.convert_read_to_format(self.format, force_quality_encoding=self.force_quality_encoding)
+            fastq_read = fastq_read.convert_read_to_format(
+                self.format, force_quality_encoding=self.force_quality_encoding
+            )
         self.file.write(str(fastq_read))
 
 
@@ -821,28 +864,28 @@ class fastqJoiner:
         self.paste_decimal_quality = " ".join(str(outformat.quality_max) for x in range(len(paste)))
 
     def join(self, read1, read2):
-        read1_id, read1_sep, read1_desc = read1.identifier.partition(' ')
-        read2_id, read2_sep, read2_desc = read2.identifier.partition(' ')
-        if read1_id.endswith('/2') and read2_id.endswith('/1'):
+        read1_id, read1_sep, read1_desc = read1.identifier.partition(" ")
+        read2_id, read2_sep, read2_desc = read2.identifier.partition(" ")
+        if read1_id.endswith("/2") and read2_id.endswith("/1"):
             # swap 1 and 2
             tmp = read1
             read1 = read2
             read2 = tmp
             del tmp
-        if read1_id.endswith('/1') and read2_id.endswith('/2'):
+        if read1_id.endswith("/1") and read2_id.endswith("/2"):
             read1_id = read1_id[:-2]
 
         identifier = read1_id
         if read1_desc:
-            identifier = identifier + ' ' + read1_desc
+            identifier = identifier + " " + read1_desc
 
         # use force quality encoding, if not present force to encoding of first read
         force_quality_encoding = self.force_quality_encoding
         if not force_quality_encoding:
             if read1.is_ascii_encoded():
-                force_quality_encoding = 'ascii'
+                force_quality_encoding = "ascii"
             else:
-                force_quality_encoding = 'decimal'
+                force_quality_encoding = "decimal"
 
         new_read1 = read1.convert_read_to_format(self.format, force_quality_encoding=force_quality_encoding)
         new_read2 = read2.convert_read_to_format(self.format, force_quality_encoding=force_quality_encoding)
@@ -851,14 +894,18 @@ class fastqJoiner:
         if len(read1.description) > 1:
             rval.description = "+" + identifier[1:]
         else:
-            rval.description = '+'
-        if rval.sequence_space == 'color':
+            rval.description = "+"
+        if rval.sequence_space == "color":
             # need to handle color space joining differently
             # convert to nuc space, join, then convert back
-            rval.sequence = rval.convert_base_to_color_space(new_read1.convert_color_to_base_space(new_read1.sequence) + self.paste_sequence + new_read2.convert_color_to_base_space(new_read2.sequence))
+            rval.sequence = rval.convert_base_to_color_space(
+                new_read1.convert_color_to_base_space(new_read1.sequence)
+                + self.paste_sequence
+                + new_read2.convert_color_to_base_space(new_read2.sequence)
+            )
         else:
             rval.sequence = new_read1.sequence + self.paste_sequence + new_read2.sequence
-        if force_quality_encoding == 'ascii':
+        if force_quality_encoding == "ascii":
             rval.quality = new_read1.quality + self.paste_ascii_quality + new_read2.quality
         else:
             rval.quality = f"{new_read1.quality.strip()} {self.paste_decimal_quality}"
@@ -866,8 +913,8 @@ class fastqJoiner:
         return rval
 
     def get_paired_identifier(self, fastq_read):
-        read_id, read_sep, read_desc = fastq_read.identifier.partition(' ')
-        if read_id[-2] == '/':
+        read_id, read_sep, read_desc = fastq_read.identifier.partition(" ")
+        if read_id[-2] == "/":
             if read_id[-1] == "1":
                 read_id = f"{read_id[:-1]}2"
             elif read_id[-1] == "2":
@@ -878,8 +925,8 @@ class fastqJoiner:
         is_first = None
         if not isinstance(sequence_id, str):
             sequence_id = sequence_id.identifier
-        sequence_id, sequence_sep, sequence_desc = sequence_id.partition(' ')
-        if sequence_id[-2] == '/':
+        sequence_id, sequence_sep, sequence_desc = sequence_id.partition(" ")
+        if sequence_id[-2] == "/":
             if sequence_id[-1] == "1":
                 is_first = True
             else:
@@ -912,36 +959,38 @@ class fastqCombiner:
     def combine(self, fasta_seq, quality_seq):
         fastq_read = fastqSequencingRead.get_class_by_format(self.format)()
         fastq_read.identifier = f"@{fasta_seq.identifier[1:]}"
-        fastq_read.description = '+'
+        fastq_read.description = "+"
         fastq_read.sequence = fasta_seq.sequence
         fastq_read.quality = quality_seq.sequence
         return fastq_read
 
 
 class fastqFakeFastaScoreReader:
-    def __init__(self, format='sanger', quality_encoding=None):
+    def __init__(self, format="sanger", quality_encoding=None):
         self.fastq_read = fastqSequencingRead.get_class_by_format(format)()
-        if quality_encoding != 'decimal':
-            quality_encoding = 'ascii'
+        if quality_encoding != "decimal":
+            quality_encoding = "ascii"
         self.quality_encoding = quality_encoding
 
     def close(self):
         return  # nothing to close
 
     def get(self, sequence):
-        assert isinstance(sequence, fastaSequence), 'fastqFakeFastaScoreReader requires a fastaSequence object as the parameter'
+        assert isinstance(
+            sequence, fastaSequence
+        ), "fastqFakeFastaScoreReader requires a fastaSequence object as the parameter"
         # add sequence to fastq_read, then get_sequence(), color space adapters do not have quality score values
         self.fastq_read.sequence = sequence.sequence
         new_sequence = fastaSequence()
         new_sequence.identifier = sequence.identifier
-        if self.quality_encoding == 'ascii':
+        if self.quality_encoding == "ascii":
             new_sequence.sequence = chr(self.fastq_read.ascii_max) * len(self.fastq_read.get_sequence())
         else:
-            new_sequence.sequence = (f"{self.fastq_read.quality_max:d} " * len(self.fastq_read.get_sequence()))
+            new_sequence.sequence = f"{self.fastq_read.quality_max:d} " * len(self.fastq_read.get_sequence())
         return new_sequence
 
     def has_data(self):
-        return ''  # No actual data exist, none can be remaining
+        return ""  # No actual data exist, none can be remaining
 
 
 class fastqFormatError(Exception):

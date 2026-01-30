@@ -9,19 +9,19 @@ from galaxy_utils.sequence.fastq import (
 
 
 def get_score_comparer(operator):
-    if operator == 'gt':
+    if operator == "gt":
         return compare_gt
-    elif operator == 'ge':
+    elif operator == "ge":
         return compare_ge
-    elif operator == 'eq':
+    elif operator == "eq":
         return compare_eq
-    elif operator == 'lt':
+    elif operator == "lt":
         return compare_lt
-    elif operator == 'le':
+    elif operator == "le":
         return compare_le
-    elif operator == 'ne':
+    elif operator == "ne":
         return compare_ne
-    raise f'Invalid operator provided: {operator}'
+    raise f"Invalid operator provided: {operator}"
 
 
 def compare_gt(quality_score, threshold_value):
@@ -60,12 +60,58 @@ class BaseReplacer:
 def main():
     usage = "usage: %prog [options] input_file output_file"
     parser = OptionParser(usage=usage)
-    parser.add_option('-f', '--format', dest='format', type='choice', default='sanger', choices=('sanger', 'solexa', 'illumina', 'sanger.gz', 'solexa.gz', 'illumina.gz', 'sanger.bz2', 'solexa.bz2', 'illumina.bz2'), help='FASTQ variant type')
-    parser.add_option('-m', '--mask_character', dest='mask_character', default='N', help='Mask Character to use')
-    parser.add_option('-c', '--score_comparison', type="choice", dest='score_comparison', default='le', choices=('gt', 'ge', 'eq', 'lt', 'le', 'ne'), help='Mask base when score is')
-    parser.add_option('-s', '--quality_score', type="float", dest='quality_score', default='0', help='Quality Score')
-    parser.add_option("-l", "--lowercase", action="store_true", dest="lowercase", default=False, help="Use lowercase masking")
-    (options, args) = parser.parse_args()
+    parser.add_option(
+        "-f",
+        "--format",
+        dest="format",
+        type="choice",
+        default="sanger",
+        choices=(
+            "sanger",
+            "solexa",
+            "illumina",
+            "sanger.gz",
+            "solexa.gz",
+            "illumina.gz",
+            "sanger.bz2",
+            "solexa.bz2",
+            "illumina.bz2",
+        ),
+        help="FASTQ variant type",
+    )
+    parser.add_option(
+        "-m",
+        "--mask_character",
+        dest="mask_character",
+        default="N",
+        help="Mask Character to use",
+    )
+    parser.add_option(
+        "-c",
+        "--score_comparison",
+        type="choice",
+        dest="score_comparison",
+        default="le",
+        choices=("gt", "ge", "eq", "lt", "le", "ne"),
+        help="Mask base when score is",
+    )
+    parser.add_option(
+        "-s",
+        "--quality_score",
+        type="float",
+        dest="quality_score",
+        default="0",
+        help="Quality Score",
+    )
+    parser.add_option(
+        "-l",
+        "--lowercase",
+        action="store_true",
+        dest="lowercase",
+        default=False,
+        help="Use lowercase masking",
+    )
+    options, args = parser.parse_args()
 
     if len(args) != 2:
         parser.error("Need to specify an input file and an output file")

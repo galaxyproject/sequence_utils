@@ -12,7 +12,7 @@ from galaxy_utils.sequence.fastq import (
 
 def main():
     input_filename = sys.argv[1]
-    input_type = sys.argv[2] or 'sanger'
+    input_type = sys.argv[2] or "sanger"
     mate1_filename = sys.argv[3]
     mate2_filename = sys.argv[4]
     single1_filename = sys.argv[5]
@@ -64,8 +64,8 @@ def main():
         print("Your input file contained no valid FASTQ sequences.")
     else:
         if skip_count:
-            print(f'There were {skip_count:d} reads with no mate.')
-        print(f'De-interlaced {(i - skip_count + 1) / 2} pairs of sequences.')
+            print(f"There were {skip_count:d} reads with no mate.")
+        print(f"De-interlaced {(i - skip_count + 1) / 2} pairs of sequences.")
 
 
 if __name__ == "__main__":

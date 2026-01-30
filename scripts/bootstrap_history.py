@@ -44,12 +44,12 @@ def main(argv):
         message = commit["message"]
         message = get_first_sentence(message)
     elif requests is not None and ident.startswith("pr"):
-        pull_request = ident[len("pr"):]
+        pull_request = ident[len("pr") :]
         api_url = urllib.parse.urljoin(PROJECT_API, f"pulls/{pull_request}")
         req = requests.get(api_url).json()
         message = req["title"]
     elif requests is not None and ident.startswith("issue"):
-        issue = ident[len("issue"):]
+        issue = ident[len("issue") :]
         api_url = urllib.parse.urljoin(PROJECT_API, f"issues/{issue}")
         req = requests.get(api_url).json()
         message = req["title"]
@@ -59,12 +59,12 @@ def main(argv):
     to_doc = message + " "
 
     if ident.startswith("pr"):
-        pull_request = ident[len("pr"):]
+        pull_request = ident[len("pr") :]
         text = f".. _Pull Request {pull_request}: {PROJECT_URL}/pull/{pull_request}"
         history = extend(".. github_links", text)
         to_doc += f"`Pull Request {pull_request}`_"
     elif ident.startswith("issue"):
-        issue = ident[len("issue"):]
+        issue = ident[len("issue") :]
         text = f".. _Issue {issue}: {PROJECT_URL}/issues/{issue}"
         history = extend(".. github_links", text)
         to_doc += f"`Issue {issue}`_"
@@ -87,7 +87,7 @@ def get_first_sentence(message):
 
 def wrap(message):
     wrapper = textwrap.TextWrapper(initial_indent="* ")
-    wrapper.subsequent_indent = '  '
+    wrapper.subsequent_indent = "  "
     wrapper.width = 78
     return "\n".join(wrapper.wrap(message))
 

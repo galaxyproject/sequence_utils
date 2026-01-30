@@ -14,9 +14,9 @@ def main():
     output_filename = sys.argv[2]
     left_offset = sys.argv[3]
     right_offset = sys.argv[4]
-    percent_offsets = sys.argv[5] == 'offsets_percent'
-    input_type = sys.argv[6] or 'sanger'
-    keep_zero_length = sys.argv[7] == 'keep_zero_length'
+    percent_offsets = sys.argv[5] == "offsets_percent"
+    input_type = sys.argv[6] or "sanger"
+    keep_zero_length = sys.argv[7] == "keep_zero_length"
 
     num_reads_excluded = 0
     num_reads = None

@@ -13,9 +13,9 @@ class SequencingRead:
 
     def __init__(self):
         self.identifier = None
-        self.sequence = ''  # holds raw sequence string: no whitespace
+        self.sequence = ""  # holds raw sequence string: no whitespace
         self.description = None
-        self.quality = ''  # holds raw quality string: no whitespace, unless this contains decimal scores
+        self.quality = ""  # holds raw quality string: no whitespace, unless this contains decimal scores
 
     def __len__(self):
         return len(self.sequence)
@@ -24,13 +24,13 @@ class SequencingRead:
         return f"{self.identifier}\n{self.sequence}\n{self.description}\n{self.quality}\n"
 
     def append_sequence(self, sequence):
-        self.sequence += sequence.rstrip('\n\r')
+        self.sequence += sequence.rstrip("\n\r")
 
     def append_quality(self, quality):
-        self.quality += quality.rstrip('\n\r')
+        self.quality += quality.rstrip("\n\r")
 
     def is_DNA(self):
-        return 'u' not in self.sequence.lower()
+        return "u" not in self.sequence.lower()
 
     def clone(self):
         return deepcopy(self)

@@ -6,7 +6,7 @@ import gzip
 class fastaSequence:
     def __init__(self):
         self.identifier = None
-        self.sequence = ''  # holds raw sequence string: no whitespace
+        self.sequence = ""  # holds raw sequence string: no whitespace
 
     def __len__(self):
         return len(self.sequence)
@@ -25,25 +25,27 @@ class fastaReader:
     def __next__(self):
         line = self.file.readline()
         # remove header comment lines
-        while line and line.startswith('#'):
+        while line and line.startswith("#"):
             line = self.file.readline()
         if not line:
             raise StopIteration
-        assert line.startswith('>'), "FASTA headers must start with >"
+        assert line.startswith(">"), "FASTA headers must start with >"
         rval = fastaSequence()
         rval.identifier = line.strip()
         offset = self.file.tell()
         while True:
             line = self.file.readline()
-            if not line or line.startswith('>'):
+            if not line or line.startswith(">"):
                 if line:
-                    self.file.seek(offset)  # this causes sequence id lines to be read twice, once to determine previous sequence end and again when getting actual sequence; can we cache this to prevent it from being re-read?
+                    self.file.seek(
+                        offset
+                    )  # this causes sequence id lines to be read twice, once to determine previous sequence end and again when getting actual sequence; can we cache this to prevent it from being re-read?
                 return rval
             # 454 qual test data that was used has decimal scores that don't have trailing spaces
             # so we'll need to parse and build these sequences not based upon de facto standards
             # i.e. in a less than ideal fashion
             line = line.rstrip()
-            if ' ' in rval.sequence or ' ' in line:
+            if " " in rval.sequence or " " in line:
                 rval.sequence = f"{rval.sequence}{line} "
             else:
                 rval.sequence += line
@@ -102,7 +104,7 @@ class fastaNamedReader:
         # returns a string representation of remaining data, or empty string (False) if no data remaining
         eof = self.eof
         count = 0
-        rval = ''
+        rval = ""
         if self.offset_dict:
             count = sum(map(len, self.offset_dict.values()))
         if not eof:

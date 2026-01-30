@@ -14,7 +14,7 @@ def main():
     descr_split = int(sys.argv[3]) - 1
     if descr_split < 0:
         _stop_err("Bad description split value (should be 1 or more)")
-    input_type = sys.argv[4] or 'sanger'  # input type should ordinarily be unnecessary
+    input_type = sys.argv[4] or "sanger"  # input type should ordinarily be unnecessary
 
     num_reads = None
     fastq_read = None
@@ -24,13 +24,25 @@ def main():
         if descr_split == 0:
             # Don't divide the description into multiple columns
             for num_reads, fastq_read in enumerate(reader):
-                out.write("{}\t{}\t{}\n".format(fastq_read.identifier[1:].replace('\t', ' '), fastq_read.sequence.replace('\t', ' '), fastq_read.quality.replace('\t', ' ')))  # noqa: SFS201
+                out.write(
+                    "{}\t{}\t{}\n".format(  # noqa: SFS201
+                        fastq_read.identifier[1:].replace("\t", " "),
+                        fastq_read.sequence.replace("\t", " "),
+                        fastq_read.quality.replace("\t", " "),
+                    )
+                )
         else:
             for num_reads, fastq_read in enumerate(reader):
-                words = fastq_read.identifier[1:].replace('\t', ' ').split(None, descr_split)
+                words = fastq_read.identifier[1:].replace("\t", " ").split(None, descr_split)
                 # pad with empty columns if required
                 words += [""] * (descr_split - len(words))
-                out.write("{}\t{}\t{}\n".format("\t".join(words), fastq_read.sequence.replace('\t', ' '), fastq_read.quality.replace('\t', ' ')))  # noqa: SFS201
+                out.write(
+                    "{}\t{}\t{}\n".format(  # noqa: SFS201
+                        "\t".join(words),
+                        fastq_read.sequence.replace("\t", " "),
+                        fastq_read.quality.replace("\t", " "),
+                    )
+                )
 
     if num_reads is None:
         print("No valid FASTQ reads could be processed.")

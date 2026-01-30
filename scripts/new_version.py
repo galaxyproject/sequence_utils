@@ -33,22 +33,31 @@ def main(argv):
         from_str += "\n"
         return history.replace(from_str, from_str + line + "\n")
 
-    history = extend(".. to_doc", f"""
+    history = extend(
+        ".. to_doc",
+        f"""
 ---------------------
 {new_version}.dev0
 ---------------------
 
-""")
+""",
+    )
     open(history_path, "w").write(history)
 
     source_mod_path = os.path.join(PROJECT_DIRECTORY, source_dir, "__init__.py")
     mod = open(source_mod_path).read()
-    mod = re.sub(r"__version__ = '[\d\.]+'",
-                 f"__version__ = '{new_version}.dev0'",
-                 mod, 1)
+    mod = re.sub(r"__version__ = '[\d\.]+'", f"__version__ = '{new_version}.dev0'", mod, 1)
     mod = open(source_mod_path, "w").write(mod)
-    shell(["git", "commit", "-m", f"Starting work on {new_version}",
-           "HISTORY.rst", f"{source_dir}/__init__.py"])
+    shell(
+        [
+            "git",
+            "commit",
+            "-m",
+            f"Starting work on {new_version}",
+            "HISTORY.rst",
+            f"{source_dir}/__init__.py",
+        ]
+    )
 
 
 def shell(cmds, **kwds):

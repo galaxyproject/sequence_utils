@@ -10,7 +10,7 @@ from galaxy_utils.sequence.fastq import fastqReader
 def main():
     input_filename = sys.argv[1]
     output_filename = sys.argv[2]
-    input_type = sys.argv[3] or 'sanger'  # input type should ordinarily be unnecessary
+    input_type = sys.argv[3] or "sanger"  # input type should ordinarily be unnecessary
 
     num_reads = None
     fastq_read = None

@@ -11,7 +11,7 @@ from galaxy_utils.sequence.fastq import (
 
 def execfile(path, vars):
     with open(path) as f:
-        code = compile(f.read(), path, 'exec')
+        code = compile(f.read(), path, "exec")
         exec(code, vars)
 
 
@@ -21,11 +21,11 @@ def main():
     script_filename = sys.argv[2]
     output_filename = sys.argv[3]
     additional_files_path = sys.argv[4]
-    input_type = sys.argv[5] or 'sanger'
+    input_type = sys.argv[5] or "sanger"
 
     # Save script file for debuging/verification info later
     os.mkdir(additional_files_path)
-    shutil.copy(script_filename, os.path.join(additional_files_path, 'debug.txt'))
+    shutil.copy(script_filename, os.path.join(additional_files_path, "debug.txt"))
 
     i = None
     reads_kept = 0
@@ -45,7 +45,7 @@ def main():
     if i is None:
         print("Your file contains no valid fastq reads.")
     else:
-        print(f'Kept {reads_kept} of {i + 1} reads ({float(reads_kept) / float(i + 1) * 100.0:.2f}%).')
+        print(f"Kept {reads_kept} of {i + 1} reads ({float(reads_kept) / float(i + 1) * 100.0:.2f}%).")
 
 
 if __name__ == "__main__":

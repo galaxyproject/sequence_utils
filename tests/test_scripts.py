@@ -32,90 +32,185 @@ TEST_DATA_DIR = TEST_DIR
 class FastqGroomerTestCase(unittest.TestCase):
 
     def test_args_all(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'ascii', 'summarize_input', '--fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "sanger.gz",
+            "ascii",
+            "summarize_input",
+            "--fix-id",
+        ]
         with _new_argv(args):
             g = Groomer()
-            self.assertEqual('i_file', g.input_filename)
-            self.assertEqual('sanger', g.input_type)
-            self.assertEqual('o_file', g.output_filename)
-            self.assertEqual('sanger.gz', g.output_type)
-            self.assertEqual('ascii', g.force_quality_encoding)
+            self.assertEqual("i_file", g.input_filename)
+            self.assertEqual("sanger", g.input_type)
+            self.assertEqual("o_file", g.output_filename)
+            self.assertEqual("sanger.gz", g.output_type)
+            self.assertEqual("ascii", g.force_quality_encoding)
             self.assertTrue(g.summarize_input)
             self.assertTrue(g.fix_id)
 
     def test_args_force_qual_enc_none(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "sanger.gz",
+            "None",
+            "summarize_input",
+            "--fix-id",
+        ]
         with _new_argv(args):
             g = Groomer()
             self.assertIsNone(g.force_quality_encoding)
 
     def test_args_input_type_illegal_choice(self):
-        args = ['i_file', 'ILLEGAL', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--fix-id']
+        args = [
+            "i_file",
+            "ILLEGAL",
+            "o_file",
+            "sanger.gz",
+            "None",
+            "summarize_input",
+            "--fix-id",
+        ]
         with _new_argv(args):
             with self.assertRaises(SystemExit):
                 Groomer()
 
     def test_args_output_type_illegal_choice(self):
-        args = ['i_file', 'sanger', 'o_file', 'ILLEGAL', 'None', 'summarize_input', '--fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "ILLEGAL",
+            "None",
+            "summarize_input",
+            "--fix-id",
+        ]
         with _new_argv(args):
             with self.assertRaises(SystemExit):
                 Groomer()
 
     def test_args_force_qual_enc_illegal_choice(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'ILLEGAL', 'summarize_input', '--fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "sanger.gz",
+            "ILLEGAL",
+            "summarize_input",
+            "--fix-id",
+        ]
         with _new_argv(args):
             with self.assertRaises(SystemExit):
                 Groomer()
 
     def test_args_summarize_imput_illegal_choice(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'ILLEGAL', '--fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "sanger.gz",
+            "None",
+            "ILLEGAL",
+            "--fix-id",
+        ]
         with _new_argv(args):
             with self.assertRaises(SystemExit):
                 Groomer()
 
     def test_args_fixid_default(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input']
+        args = ["i_file", "sanger", "o_file", "sanger.gz", "None", "summarize_input"]
         with _new_argv(args):
             g = Groomer()
             self.assertTrue(g.fix_id)
 
     def test_args_fixid_yes(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "sanger.gz",
+            "None",
+            "summarize_input",
+            "--fix-id",
+        ]
         with _new_argv(args):
             g = Groomer()
             self.assertTrue(g.fix_id)
 
     def test_args_fixid_no(self):
-        args = ['i_file', 'sanger', 'o_file', 'sanger.gz', 'None', 'summarize_input', '--no-fix-id']
+        args = [
+            "i_file",
+            "sanger",
+            "o_file",
+            "sanger.gz",
+            "None",
+            "summarize_input",
+            "--no-fix-id",
+        ]
         with _new_argv(args):
             g = Groomer()
             self.assertFalse(g.fix_id)
 
     def test_fix_inconsistent_id(self):
-        i_path = _data_path('test_data/fastqreader_min_invalid-line3')
-        o_path = _data_path('test_data/fastqreader_min_invalid-line3_fixed')
-        with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--fix-id']):
+        i_path = _data_path("test_data/fastqreader_min_invalid-line3")
+        o_path = _data_path("test_data/fastqreader_min_invalid-line3_fixed")
+        with _new_argv(
+            [
+                i_path,
+                "sanger",
+                "output",
+                "sanger",
+                "ascii",
+                "summarize_input",
+                "--fix-id",
+            ]
+        ):
             fastq_groomer.main()
             _assert_paths_equal("output", o_path)
 
     def test_donot_fix_inconsistent_id(self):
-        i_path = _data_path('test_data/fastqreader_min_invalid-line3')
-        with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--no-fix-id']):
+        i_path = _data_path("test_data/fastqreader_min_invalid-line3")
+        with _new_argv(
+            [
+                i_path,
+                "sanger",
+                "output",
+                "sanger",
+                "ascii",
+                "summarize_input",
+                "--no-fix-id",
+            ]
+        ):
             with self.assertRaises(fastqFormatError):
                 fastq_groomer.main()
 
     def test_file_closed_on_inconsistent_id_error(self):
-        i_path = _data_path('test_data/fastqreader_min_invalid-line3')
+        i_path = _data_path("test_data/fastqreader_min_invalid-line3")
         fh = open(i_path)
 
-        with _new_argv([i_path, "sanger", "output", "sanger", 'ascii', 'summarize_input', '--no-fix-id']):
+        with _new_argv(
+            [
+                i_path,
+                "sanger",
+                "output",
+                "sanger",
+                "ascii",
+                "summarize_input",
+                "--no-fix-id",
+            ]
+        ):
             with self.assertRaises(fastqFormatError):
                 g = Groomer(fh)
                 g.run()
 
         self.assertTrue(
             fh.closed,
-            'File should be closed if exception occurs due to inconsistent id')
+            "File should be closed if exception occurs due to inconsistent id",
+        )
 
 
 def test_fasta_reader_cleanup():
@@ -174,7 +269,7 @@ def test_fastq_to_tabular_bz2():
 
 def test_fastq_groomer_bz2():
     i_path = _data_path("sanger_full_range_original_sanger.fastqsanger.bz2")
-    with _new_argv([i_path, "sanger.bz2", "output", "sanger.bz2", 'ascii', 'summarize_input']):
+    with _new_argv([i_path, "sanger.bz2", "output", "sanger.bz2", "ascii", "summarize_input"]):
         fastq_groomer.main()
         _assert_paths_equal("output", i_path)
 
@@ -190,8 +285,28 @@ def test_fastq_combiner():
 def test_fastq_trimmer_by_quality():
     i_path = _data_path("sanger_full_range_original_sanger.fastqsanger.bz2")
     o_path = _data_path("sanger_full_range_quality_trimmed_out_1.fastqsanger.bz2")
-    with _new_argv([i_path, "output", "-f", "sanger.bz2", "-s", "1",
-                    "-t", "1", "-e", "53", "-a", "min", "-x", "0", "-c", ">=", "-q", "20"]):
+    with _new_argv(
+        [
+            i_path,
+            "output",
+            "-f",
+            "sanger.bz2",
+            "-s",
+            "1",
+            "-t",
+            "1",
+            "-e",
+            "53",
+            "-a",
+            "min",
+            "-x",
+            "0",
+            "-c",
+            ">=",
+            "-q",
+            "20",
+        ]
+    ):
         fastq_trimmer_by_quality.main()
         _assert_paths_equal("output", o_path)
 

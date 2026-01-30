@@ -64,9 +64,9 @@ class FastqJoiner(fq.fastqJoiner):
         force_quality_encoding = self.force_quality_encoding
         if not force_quality_encoding:
             if read1.is_ascii_encoded():
-                force_quality_encoding = 'ascii'
+                force_quality_encoding = "ascii"
             else:
-                force_quality_encoding = 'decimal'
+                force_quality_encoding = "decimal"
         read1 = read1.convert_read_to_format(self.format, force_quality_encoding=force_quality_encoding)
         read2 = read2.convert_read_to_format(self.format, force_quality_encoding=force_quality_encoding)
         # --
@@ -82,15 +82,16 @@ class FastqJoiner(fq.fastqJoiner):
         rval.description = "+"
         if len(read1.description) > 1:
             rval.description += rval.identifier[1:]
-        if rval.sequence_space == 'color':
+        if rval.sequence_space == "color":
             # convert to nuc space, join, then convert back
             rval.sequence = rval.convert_base_to_color_space(
-                read1.convert_color_to_base_space(read1.sequence) + self.paste_sequence
+                read1.convert_color_to_base_space(read1.sequence)
+                + self.paste_sequence
                 + read2.convert_color_to_base_space(read2.sequence)
             )
         else:
             rval.sequence = read1.sequence + self.paste_sequence + read2.sequence
-        if force_quality_encoding == 'ascii':
+        if force_quality_encoding == "ascii":
             rval.quality = read1.quality + self.paste_ascii_quality + read2.quality
         else:
             rval.quality = f"{read1.quality.strip()} {self.paste_decimal_quality}"
@@ -115,19 +116,19 @@ def sniff_sep(fastq_fn):
 def main():
     # Read command line arguments
     input1_filename = sys.argv[1]
-    input1_type = sys.argv[2] or 'sanger'
+    input1_type = sys.argv[2] or "sanger"
     input2_filename = sys.argv[3]
-    input2_type = sys.argv[4] or 'sanger'
+    input2_type = sys.argv[4] or "sanger"
     output_filename = sys.argv[5]
 
-    fastq_style = sys.argv[6] or 'old'
+    fastq_style = sys.argv[6] or "old"
 
-    paste = sys.argv[7] or ''
+    paste = sys.argv[7] or ""
     # --
     if input1_type != input2_type:
         print(f"WARNING: You are trying to join files of two different types: {input1_type} and {input2_type}.")
 
-    if fastq_style == 'new':
+    if fastq_style == "new":
         sep = sniff_sep(input1_filename)
         joiner = FastqJoiner(input1_type, sep=sep, paste=paste)
     else:
@@ -154,7 +155,7 @@ def main():
             print("Your file contains no valid FASTQ reads.")
         else:
             print(reader2.has_data())
-            print(f'Joined {i - skip_count + 1} of {i + 1} read pairs ({(i - skip_count + 1) / (i + 1) * 100.0:.2f}%).')
+            print(f"Joined {i - skip_count + 1} of {i + 1} read pairs ({(i - skip_count + 1) / (i + 1) * 100.0:.2f}%).")
 
 
 if __name__ == "__main__":

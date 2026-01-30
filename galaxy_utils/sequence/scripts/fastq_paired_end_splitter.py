@@ -12,7 +12,7 @@ from galaxy_utils.sequence.fastq import (
 def main():
     # Read command line arguments
     input_filename = sys.argv[1]
-    input_type = sys.argv[2] or 'sanger'
+    input_type = sys.argv[2] or "sanger"
     output1_filename = sys.argv[3]
     output2_filename = sys.argv[4]
 
@@ -35,7 +35,7 @@ def main():
     if i is None:
         print("Your file contains no valid FASTQ reads.")
     else:
-        print(f'Split {i - skip_count + 1} of {i + 1} reads ({float(i - skip_count + 1) / float(i + 1) * 100.0:.2f}%).')
+        print(f"Split {i - skip_count + 1} of {i + 1} reads ({float(i - skip_count + 1) / float(i + 1) * 100.0:.2f}%).")
 
 
 if __name__ == "__main__":

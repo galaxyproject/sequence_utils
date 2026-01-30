@@ -17,11 +17,11 @@ def main():
     script_filename = sys.argv[2]
     output_filename = sys.argv[3]
     additional_files_path = sys.argv[4]
-    input_type = sys.argv[5] or 'sanger'
+    input_type = sys.argv[5] or "sanger"
 
     # Save script file for debugging/verification info later
     os.makedirs(additional_files_path, exist_ok=True)
-    new_script_path = os.path.join(additional_files_path, 'script.py')
+    new_script_path = os.path.join(additional_files_path, "script.py")
     shutil.copy(script_filename, new_script_path)
 
     spec = importlib.util.spec_from_file_location(
@@ -48,7 +48,9 @@ def main():
     if i is None:
         print("Your file contains no valid FASTQ reads.")
     else:
-        print(f'Manipulated {reads_manipulated} of {i + 1} reads ({float(reads_manipulated) / float(i + 1) * 100.0:.2f}%).')
+        print(
+            f"Manipulated {reads_manipulated} of {i + 1} reads ({float(reads_manipulated) / float(i + 1) * 100.0:.2f}%)."
+        )
 
 
 if __name__ == "__main__":
