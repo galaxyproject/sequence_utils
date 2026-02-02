@@ -1,6 +1,57 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77.0.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "galaxy_sequence_utils"
+dynamic = ["version"]
+description = "Galaxy utilities for manipulating genomic sequences"
+readme = "README.rst"
+requires-python = ">=3.10"
+license = "AFL-3.0"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Dan Blankenberg, Galaxy Project and Community", email = "galaxy-dev@lists.galaxyproject.org"},
+]
+maintainers = [
+    {name = "Nicola Soranzo", email = "nicola.soranzo@earlham.ac.uk"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Software Development",
+]
+
+[project.scripts]
+gx-fastq-to-tabular = "galaxy_utils.sequence.scripts.fastq_to_tabular:main"
+gx-fastq-groomer = "galaxy_utils.sequence.scripts.fastq_groomer:main"
+gx-fastq-combiner = "galaxy_utils.sequence.scripts.fastq_combiner:main"
+gx-fastq-filter = "galaxy_utils.sequence.scripts.fastq_filter:main"
+gx-fastq-manipulation = "galaxy_utils.sequence.scripts.fastq_manipulation:main"
+gx-fastq-masker-by-quality = "galaxy_utils.sequence.scripts.fastq_masker_by_quality:main"
+gx-fastq-paired-end-deinterlacer = "galaxy_utils.sequence.scripts.fastq_paired_end_deinterlacer:main"
+gx-fastq-paired-end-interlacer = "galaxy_utils.sequence.scripts.fastq_paired_end_interlacer:main"
+gx-fastq-paired-end-joiner = "galaxy_utils.sequence.scripts.fastq_paired_end_joiner:main"
+gx-fastq-paired-end-splitter = "galaxy_utils.sequence.scripts.fastq_paired_end_splitter:main"
+gx-fastq-stats = "galaxy_utils.sequence.scripts.fastq_stats:main"
+gx-fastq-to-fasta = "galaxy_utils.sequence.scripts.fastq_to_fasta:main"
+gx-fastq-trimmer = "galaxy_utils.sequence.scripts.fastq_trimmer:main"
+gx-fastq-trimmer-by-quality = "galaxy_utils.sequence.scripts.fastq_trimmer_by_quality:main"
+
+[project.urls]
+Homepage = "https://github.com/galaxyproject/sequence_utils"
+"Bug Tracker" = "https://github.com/galaxyproject/sequence_utils/issues"
+"Source Code" = "https://github.com/galaxyproject/sequence_utils"
 
 [tool.black]
 line-length = 120
@@ -10,3 +61,12 @@ line-length = 120
 # flake8-implicit-str-concat (ISC) and pyupgrade (UP)
 select = ["E", "F", "G", "ISC", "UP"]
 ignore = ["E501"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "galaxy_utils.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["galaxy_utils*"]
